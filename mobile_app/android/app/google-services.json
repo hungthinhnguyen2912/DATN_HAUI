@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "898210439979",
+    "project_id": "graduation-prj-db8a5",
+    "storage_bucket": "graduation-prj-db8a5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:898210439979:android:de225e97ed44fe27ea9b6e",
+        "android_client_info": {
+          "package_name": "com.example.vegetable_classification"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1gP5_c3J0QYaAsUsUbyhOczUvD7y0Tgk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
