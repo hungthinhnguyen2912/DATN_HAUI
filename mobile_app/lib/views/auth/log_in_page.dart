@@ -4,7 +4,7 @@ import 'package:vegetable_classification/App_Color.dart';
 import 'package:vegetable_classification/components/button.dart';
 import 'package:vegetable_classification/components/input_text_field.dart';
 import 'package:vegetable_classification/views/auth/forgot_pass_page.dart';
-import 'package:vegetable_classification/views/home_page.dart';
+import 'package:vegetable_classification/views/home/home_page.dart';
 
 class LogInPage extends StatelessWidget {
   LogInPage({super.key});
