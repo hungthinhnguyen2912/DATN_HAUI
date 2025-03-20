@@ -6,6 +6,8 @@ import 'package:vegetable_classification/components/input_text_field.dart';
 import 'package:vegetable_classification/views/auth/forgot_pass_page.dart';
 import 'package:vegetable_classification/views/home/home_page.dart';
 
+import '../../P.dart';
+
 class LogInPage extends StatelessWidget {
   LogInPage({super.key});
 
@@ -48,20 +50,16 @@ class LogInPage extends StatelessWidget {
                     ],
                   ),
                 ),
-                ButtonAuth(
-                  content: "Log In",
-                  onTap: () {
-                    Get.off(() => HomePage());
-                  },
-                ),
+                ButtonAuth(content: "Log In", onTap: () => logIn()),
               ],
             ),
           ),
-          Text("or log in with",style: TextStyle(color: AppColors.gray_login_text),),
-          SizedBox(height: 60,),
-          Expanded(
-              flex: 1,
-              child: Column(children: [buildGoogleSignIn()])),
+          Text(
+            "or log in with",
+            style: TextStyle(color: AppColors.gray_login_text),
+          ),
+          SizedBox(height: 60),
+          Expanded(flex: 1, child: Column(children: [buildGoogleSignIn()])),
         ],
       ),
     );
@@ -69,7 +67,9 @@ class LogInPage extends StatelessWidget {
 
   Widget buildGoogleSignIn() {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        googleLogIn();
+      },
       child: Container(
         width: 376,
         height: 56,
@@ -96,5 +96,13 @@ class LogInPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void logIn() async {
+    await P.auth.login(_emailController.text, _passwordController.text);
+  }
+
+  void googleLogIn() async {
+    await P.auth.loginWithGoogle();
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:vegetable_classification/components/button.dart';
 
 import '../../App_Color.dart';
+import '../../P.dart';
 import '../../components/input_text_field.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -16,9 +18,9 @@ class RegisterPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20), // Thêm padding hai bên
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start, // Canh giữa màn hình
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             InputTextField(
               controller: _userNameController,
@@ -46,10 +48,19 @@ class RegisterPage extends StatelessWidget {
               obs: true,
             ),
             SizedBox(height: 10,),
-            ButtonAuth(content: "Register", onTap: () {})
+            ButtonAuth(content: "Register", onTap: () {
+              register();
+            })
           ],
         ),
       ),
     );
+  }
+  void register() async {
+    if (_passwordController.text != _confirmPasswordController.text) {
+      Get.snackbar("Error", "Mật khẩu không khớp.");
+    } else {
+      await P.auth.register(_emailController.text, _passwordController.text, _userNameController.text);
+    }
   }
 }

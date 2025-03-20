@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:vegetable_classification/models/User.dart';
+import 'package:vegetable_classification/views/auth/auth_screen.dart';
 import 'package:vegetable_classification/views/auth/log_in_page.dart';
 import 'package:vegetable_classification/views/home/home_page.dart';
 
@@ -28,31 +29,39 @@ class AuthController extends GetxController {
         credential,
       );
       if (userCredential.additionalUserInfo!.isNewUser) {
-        await _firestore.collection("User").doc(userCredential.user!.uid).set({
-          "name": googleUser.displayName,
-          "email": googleUser.email,
-          "createdAt": DateTime.now(),
-          "uid": userCredential.user!.uid,
-        });
+        await _firestore
+            .collection("User")
+            .doc(userCredential.user!.uid)
+            .set({
+              "name": googleUser.displayName,
+              "email": googleUser.email,
+              "createdAt": DateTime.now(),
+              "uid": userCredential.user!.uid,
+            })
+            .then(await Get.off(HomePage()));
       } else {
-        DocumentSnapshot userDoc =
-            await _firestore
-                .collection("User")
-                .doc(userCredential.user!.uid)
-                .get();
+        DocumentSnapshot userDoc = await _firestore
+            .collection("User")
+            .doc(userCredential.user!.uid)
+            .get()
+            .then(await Get.off(HomePage()));
         currentUser.value = UserModel(
           uid: userDoc['uid'],
           name: userDoc['name'],
           email: userDoc['email'],
           createdAt: userDoc['createdAt'],
-          avatarUrl: userDoc.data().toString().contains('avatarUrl')
-              ? userDoc['avatarUrl']
-              : "",
+          avatarUrl:
+              userDoc.data().toString().contains('avatarUrl')
+                  ? userDoc['avatarUrl']
+                  : "",
         );
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'account-exists-with-different-credential') {
-        Get.snackbar("Error", "Tài khoản đã được đăng ký bằng phương thức khác.");
+        Get.snackbar(
+          "Error",
+          "Tài khoản đã được đăng ký bằng phương thức khác.",
+        );
       } else {
         Get.snackbar("Error", "Có lỗi xảy ra: ${e.message}");
       }
@@ -70,9 +79,10 @@ class AuthController extends GetxController {
           name: userDoc['name'],
           email: userDoc['email'],
           createdAt: userDoc['createdAt'],
-          avatarUrl: userDoc.data().toString().contains('avatarUrl')
-              ? userDoc['avatarUrl']
-              : "",
+          avatarUrl:
+              userDoc.data().toString().contains('avatarUrl')
+                  ? userDoc['avatarUrl']
+                  : "",
         );
         Get.off(HomePage());
       } else {
@@ -90,14 +100,14 @@ class AuthController extends GetxController {
       UserModel user = UserModel(
         name: name,
         email: email,
-        createdAt: DateTime.now(),
+        createdAt: Timestamp.now(),
         uid: userCredential.user!.uid,
       );
       await _firestore
           .collection("User")
           .doc(userCredential.user!.uid)
           .set(user.toJson());
-      Get.off(LogInPage());
+      Get.off(AuthScreen());
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
         Get.snackbar("Error", "Email này đã được sử dụng.");
@@ -114,7 +124,7 @@ class AuthController extends GetxController {
       uid: "",
       name: "",
       email: "",
-      createdAt: DateTime.now(),
+      createdAt: Timestamp(0,0),
       avatarUrl: "",
     );
     Get.off(LogInPage());
