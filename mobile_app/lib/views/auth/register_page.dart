@@ -50,6 +50,10 @@ class RegisterPage extends StatelessWidget {
             SizedBox(height: 10,),
             ButtonAuth(content: "Register", onTap: () {
               register();
+              _passwordController.clear();
+              _confirmPasswordController.clear();
+              _emailController.clear();
+              _userNameController.clear();
             })
           ],
         ),

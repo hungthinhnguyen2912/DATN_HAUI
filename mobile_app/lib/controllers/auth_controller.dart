@@ -3,9 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:vegetable_classification/models/User.dart';
+import 'package:vegetable_classification/views/Widget/bottom_nav_bar.dart';
 import 'package:vegetable_classification/views/auth/auth_screen.dart';
-import 'package:vegetable_classification/views/auth/log_in_page.dart';
-import 'package:vegetable_classification/views/home/home_page.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -38,13 +37,13 @@ class AuthController extends GetxController {
               "createdAt": DateTime.now(),
               "uid": userCredential.user!.uid,
             })
-            .then(await Get.off(HomePage()));
+            .then(await Get.off(myBottomNavBar()));
       } else {
         DocumentSnapshot userDoc = await _firestore
             .collection("User")
             .doc(userCredential.user!.uid)
             .get()
-            .then(await Get.off(HomePage()));
+            .then(await Get.off(myBottomNavBar()));
         currentUser.value = UserModel(
           uid: userDoc['uid'],
           name: userDoc['name'],
@@ -84,7 +83,7 @@ class AuthController extends GetxController {
                   ? userDoc['avatarUrl']
                   : "",
         );
-        Get.off(HomePage());
+        Get.off(myBottomNavBar());
       } else {
         Get.snackbar("Error", "Tài khoản không tồn tại.");
       }
@@ -107,7 +106,10 @@ class AuthController extends GetxController {
           .collection("User")
           .doc(userCredential.user!.uid)
           .set(user.toJson());
-      Get.off(AuthScreen());
+      Get.defaultDialog(
+        title: "Complete",
+        onConfirm: () => Get.off(myBottomNavBar())
+      );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
         Get.snackbar("Error", "Email này đã được sử dụng.");
@@ -127,6 +129,6 @@ class AuthController extends GetxController {
       createdAt: Timestamp(0,0),
       avatarUrl: "",
     );
-    Get.off(LogInPage());
+    Get.off(AuthScreen());
   }
 }
