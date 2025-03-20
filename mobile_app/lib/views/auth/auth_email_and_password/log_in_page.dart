@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_app/views/auth/auth_phone/log_in_with_phone_page.dart';
 
-import '../../App_Color.dart';
-import '../../P.dart';
-import '../../components/button.dart';
-import '../../components/input_text_field.dart';
+import '../../../App_Color.dart';
+import '../../../P.dart';
+import '../../../components/button.dart';
+import '../../../components/input_text_field.dart';
 import 'forgot_pass_page.dart';
 
 class LogInPage extends StatelessWidget {

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 
-import '../../App_Color.dart';
-import '../../P.dart';
-import '../../components/button.dart';
-import '../../components/input_text_field.dart';
+import '../../../App_Color.dart';
+import '../../../P.dart';
+import '../../../components/button.dart';
+import '../../../components/input_text_field.dart';
 
 class RegisterPage extends StatelessWidget {
   RegisterPage({super.key});

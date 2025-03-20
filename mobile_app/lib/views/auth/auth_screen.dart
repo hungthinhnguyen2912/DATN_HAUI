@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app/views/auth/register_page.dart';
+import 'package:mobile_app/views/auth/auth_email_and_password/register_page.dart';
 
 import '../../App_Color.dart';
-import 'log_in_page.dart';
+import 'auth_email_and_password/log_in_page.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
