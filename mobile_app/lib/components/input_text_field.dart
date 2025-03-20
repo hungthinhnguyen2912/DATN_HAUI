@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:vegetable_classification/App_Color.dart';
+import '../App_Color.dart';
 
 
 class InputTextField extends StatelessWidget {

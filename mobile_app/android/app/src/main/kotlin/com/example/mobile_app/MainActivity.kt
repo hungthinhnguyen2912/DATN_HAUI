@@ -1,4 +1,4 @@
-package com.example.vegetable_classification
+package com.example.mobile_app
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:vegetable_classification/App_Color.dart';
-import 'package:vegetable_classification/views/auth/auth_screen.dart';
-import 'package:vegetable_classification/views/auth/log_in_page.dart';
+
+
+import '../../App_Color.dart';
+import 'auth_screen.dart';
 
 
 class SplashScreen extends StatefulWidget {

@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyC1gP5_c3J0QYaAsUsUbyhOczUvD7y0Tgk',
-    appId: '1:898210439979:android:de225e97ed44fe27ea9b6e',
+    appId: '1:898210439979:android:61706172f828de65ea9b6e',
     messagingSenderId: '898210439979',
     projectId: 'graduation-prj-db8a5',
     storageBucket: 'graduation-prj-db8a5.firebasestorage.app',
@@ -59,10 +59,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCApFIcMih-M5QVomnQ6UH8MvPMBZceq_8',
-    appId: '1:898210439979:ios:e0bc349f660934e1ea9b6e',
+    appId: '1:898210439979:ios:0cd0a9b129a53d9dea9b6e',
     messagingSenderId: '898210439979',
     projectId: 'graduation-prj-db8a5',
     storageBucket: 'graduation-prj-db8a5.firebasestorage.app',
-    iosBundleId: 'com.example.vegetableClassification',
+    androidClientId: '898210439979-gi92giafkifk495vseh83nrsca8rk0jr.apps.googleusercontent.com',
+    iosClientId: '898210439979-khcri6g6ps9501q2qfsk72r4usgv8hsi.apps.googleusercontent.com',
+    iosBundleId: 'com.example.mobileApp',
   );
 }

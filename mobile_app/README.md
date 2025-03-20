@@ -1,4 +1,4 @@
-# vegetable_classification
+# mobile_app
 
 A new Flutter project.
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vegetable_classification/views/auth/register_page.dart';
+import 'package:mobile_app/views/auth/register_page.dart';
 
 import '../../App_Color.dart';
 import 'log_in_page.dart';

@@ -7,12 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:898210439979:android:de225e97ed44fe27ea9b6e",
+        "mobilesdk_app_id": "1:898210439979:android:61706172f828de65ea9b6e",
         "android_client_info": {
-          "package_name": "com.example.vegetable_classification"
+          "package_name": "com.example.mobile_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "898210439979-4fda9b05cl6tf0fc18krn6o9o9qrmfsh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC1gP5_c3J0QYaAsUsUbyhOczUvD7y0Tgk"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "898210439979-4fda9b05cl6tf0fc18krn6o9o9qrmfsh.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "898210439979-1ufa9ka6veve48bqo8qamahdof4491l4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.vegetableClassification"
+              }
+            }
+          ]
         }
       }
     }

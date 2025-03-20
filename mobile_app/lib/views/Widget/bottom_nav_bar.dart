@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:vegetable_classification/App_Color.dart';
-import 'package:vegetable_classification/views/classification/classification_page.dart';
-import 'package:vegetable_classification/views/home/home_page.dart';
 
+
+import '../../App_Color.dart';
+import '../classification/classification_page.dart';
 import '../history/history_page.dart';
+import '../home/home_page.dart';
 import '../setting/setting_page.dart';
 
 class myBottomNavBar extends StatefulWidget {

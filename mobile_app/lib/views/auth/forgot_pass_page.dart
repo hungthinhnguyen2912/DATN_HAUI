@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:vegetable_classification/App_Color.dart';
-import 'package:vegetable_classification/components/button.dart';
-import 'package:vegetable_classification/components/input_text_field.dart';
-import 'package:vegetable_classification/views/auth/auth_screen.dart';
+
+import '../../App_Color.dart';
+import '../../components/button.dart';
+import '../../components/input_text_field.dart';
+import 'auth_screen.dart';
 
 class ForgotPassPage extends StatelessWidget {
   ForgotPassPage({super.key});

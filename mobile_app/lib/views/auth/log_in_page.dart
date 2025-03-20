@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:vegetable_classification/App_Color.dart';
-import 'package:vegetable_classification/components/button.dart';
-import 'package:vegetable_classification/components/input_text_field.dart';
-import 'package:vegetable_classification/views/auth/forgot_pass_page.dart';
-import 'package:vegetable_classification/views/home/home_page.dart';
 
+
+import '../../App_Color.dart';
 import '../../P.dart';
+import '../../components/button.dart';
+import '../../components/input_text_field.dart';
+import 'forgot_pass_page.dart';
 
 class LogInPage extends StatelessWidget {
   LogInPage({super.key});
