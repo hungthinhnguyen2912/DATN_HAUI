@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-
 import '../models/User.dart';
 import '../views/Widget/bottom_nav_bar.dart';
 import '../views/auth/auth_screen.dart';
@@ -21,42 +20,43 @@ class AuthController extends GetxController {
       if (googleUser == null) return;
 
       final GoogleSignInAuthentication googleAuth =
-      await googleUser.authentication;
+          await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
         accessToken: googleAuth.accessToken,
       );
+
       UserCredential userCredential = await _auth.signInWithCredential(
         credential,
       );
-      if (userCredential.additionalUserInfo!.isNewUser) {
-        await _firestore
-            .collection("User")
-            .doc(userCredential.user!.uid)
-            .set({
+      bool isNewUser = userCredential.additionalUserInfo!.isNewUser;
+
+      if (isNewUser) {
+        await _firestore.collection("User").doc(userCredential.user!.uid).set({
           "name": googleUser.displayName,
           "email": googleUser.email,
           "createdAt": DateTime.now(),
           "uid": userCredential.user!.uid,
-        })
-            .then(await Get.off(myBottomNavBar()));
-      } else {
-        DocumentSnapshot userDoc = await _firestore
-            .collection("User")
-            .doc(userCredential.user!.uid)
-            .get()
-            .then(await Get.off(myBottomNavBar()));
+        });
+      }
+      DocumentSnapshot userDoc =
+          await _firestore
+              .collection("User")
+              .doc(userCredential.user!.uid)
+              .get();
+      if (userDoc.exists) {
         currentUser.value = UserModel(
           uid: userDoc['uid'],
           name: userDoc['name'],
           email: userDoc['email'],
           createdAt: userDoc['createdAt'],
           avatarUrl:
-          userDoc.data().toString().contains('avatarUrl')
-              ? userDoc['avatarUrl']
-              : "",
+              userDoc.data().toString().contains('avatarUrl')
+                  ? userDoc['avatarUrl']
+                  : "",
         );
       }
+      Get.off(myBottomNavBar());
     } on FirebaseAuthException catch (e) {
       if (e.code == 'account-exists-with-different-credential') {
         Get.snackbar(
@@ -73,7 +73,7 @@ class AuthController extends GetxController {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       DocumentSnapshot userDoc =
-      await _firestore.collection("User").doc(_auth.currentUser!.uid).get();
+          await _firestore.collection("User").doc(_auth.currentUser!.uid).get();
       if (userDoc.exists && userDoc.data() != null) {
         currentUser.value = UserModel(
           uid: userDoc['uid'],
@@ -81,9 +81,9 @@ class AuthController extends GetxController {
           email: userDoc['email'],
           createdAt: userDoc['createdAt'],
           avatarUrl:
-          userDoc.data().toString().contains('avatarUrl')
-              ? userDoc['avatarUrl']
-              : "",
+              userDoc.data().toString().contains('avatarUrl')
+                  ? userDoc['avatarUrl']
+                  : "",
         );
         Get.off(myBottomNavBar());
       } else {
@@ -109,8 +109,8 @@ class AuthController extends GetxController {
           .doc(userCredential.user!.uid)
           .set(user.toJson());
       Get.defaultDialog(
-          title: "Complete",
-          onConfirm: () => Get.off(myBottomNavBar())
+        title: "Complete",
+        onConfirm: () => Get.off(myBottomNavBar()),
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
@@ -128,7 +128,7 @@ class AuthController extends GetxController {
       uid: "",
       name: "",
       email: "",
-      createdAt: Timestamp(0,0),
+      createdAt: Timestamp(0, 0),
       avatarUrl: "",
     );
     Get.off(AuthScreen());
