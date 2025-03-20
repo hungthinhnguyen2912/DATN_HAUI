@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
+import 'package:mobile_app/views/auth/auth_phone/log_in_with_phone_page.dart';
 
 import '../../App_Color.dart';
 import '../../P.dart';
@@ -29,12 +29,14 @@ class LogInPage extends StatelessWidget {
                   hintText: "Email",
                   obs: false,
                   textWarning: 'Enter your email',
+                  readOnly: false,
                 ),
                 InputTextField(
                   controller: _passwordController,
                   hintText: "Password",
                   obs: true,
                   textWarning: 'Enter your password',
+                  readOnly: false,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(right: 20),
@@ -59,7 +61,10 @@ class LogInPage extends StatelessWidget {
             style: TextStyle(color: AppColors.gray_login_text),
           ),
           SizedBox(height: 60),
-          Expanded(flex: 1, child: Column(children: [buildGoogleSignIn()])),
+          Expanded(
+            flex: 1,
+            child: Column(children: [buildGoogleSignIn(),SizedBox(height: 20,), buildPhoneSignIn()]),
+          ),
         ],
       ),
     );
@@ -86,6 +91,39 @@ class LogInPage extends StatelessWidget {
               SizedBox(width: 10),
               Text(
                 "Log in with Google",
+                style: TextStyle(
+                  color: AppColors.gray_login_text,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildPhoneSignIn() {
+    return GestureDetector(
+      onTap: () {
+        Get.to(LogInWithPhonePage());
+      },
+      child: Container(
+        width: 376,
+        height: 56,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.gray_login_text),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.phone),
+              SizedBox(width: 10),
+              Text(
+                "Log in with Phone",
                 style: TextStyle(
                   color: AppColors.gray_login_text,
                   fontWeight: FontWeight.bold,

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../App_Color.dart';
-import '../../P.dart';
-import '../../components/button.dart';
-import '../../components/input_text_field.dart';
-import 'auth_screen.dart';
+import '../../../App_Color.dart';
+import '../../../P.dart';
+import '../../../components/button.dart';
+import '../../../components/input_text_field.dart';
+import '../auth_screen.dart';
 
-class ForgotPassPage extends StatelessWidget {
-  ForgotPassPage({super.key});
 
-  final TextEditingController _forgotPassController = TextEditingController();
+class LogInWithPhonePage extends StatelessWidget {
+  LogInWithPhonePage({super.key});
+
+  final TextEditingController _phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,7 @@ class ForgotPassPage extends StatelessWidget {
                 ),
                 SizedBox(height: 26),
                 Text(
-                  "Forgot password",
+                  "Sign in with phone",
                   style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
@@ -50,24 +51,23 @@ class ForgotPassPage extends StatelessWidget {
                 ),
                 SizedBox(height: 18),
                 Text(
-                  "Please enter your email to reset your password",
+                  "Enter your phone number to verify your account",
                   style: TextStyle(color: AppColors.gray_login_text),
                 ),
               ],
             ),
           ),
           InputTextField(
-            controller: _forgotPassController,
-            textWarning: "Enter your email",
-            hintText: "Enter your email",
+            controller: _phoneController,
+            textWarning: "Enter your phone number",
+            hintText: "Enter your phone number",
             obs: false, readOnly: false,
           ),
           Padding(
             padding: const EdgeInsets.only(left: 20),
             child: ButtonAuth(
-              content: "Reset password",
+              content: "Verify phone number",
               onTap: () {
-                P.auth.resetPassword(_forgotPassController.text);
               },
             ),
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobile_app/views/setting/items_setting_page/edit_profile_page.dart';
 
 import '../../App_Color.dart';
 import '../../P.dart';
@@ -10,10 +11,11 @@ class SettingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
         backgroundColor: AppColors.green,
         title: Text(
-          "Setting",
+          "Settings",
           style: TextStyle(
             color: AppColors.text_color,
             fontSize: 20,
@@ -21,99 +23,150 @@ class SettingPage extends StatelessWidget {
           ),
         ),
       ),
-      body: Column(
+      body: ListView(
         children: [
-          SizedBox(height: 30,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                radius: 30,
-                child: Icon(Icons.account_circle_outlined,size: 40,),
-              ),
-              SizedBox(width: 20,),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Obx(
-                    () => Text(
-                      P.auth.currentUser.value?.name ?? "Unknown",
-                      style: TextStyle(fontSize: 25),
-                    ),
-                  ),
-                  Obx(
-                    () => Text(
-                      P.auth.currentUser.value?.email ?? "Unknown email",
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(height: 20,),
-          Divider(
-            thickness: 1,
-            color: AppColors.green,
-            endIndent: 27.98,
-            indent: 27.98,
-          ),
-          SizedBox(height: 20,),
-          _buildItem(Icons.person, "Edit Profile" ,() {}),
-          _buildItem(Icons.key, "Change password",() {}),
-          SizedBox(height: 30 ,),
-          Divider(
-            thickness: 1,
-            color: AppColors.green,
-            endIndent: 27.98,
-            indent: 27.98,
-          ),
-          _buildItem(Icons.notifications, "Notification", () {}),
-          _buildItem(Icons.language, "Language", () {}),
-          _buildItem(Icons.logout, "Logout", () {
-            P.auth.logOut();
-          }),
+          const SizedBox(height: 30),
+          _buildProfileSection(),
+          const SizedBox(height: 20),
+          _buildDivider(),
+          const SizedBox(height: 20),
+          _buildAccountSettings(),
+          const SizedBox(height: 30),
+          _buildDivider(),
+          _buildAppSettings(),
         ],
       ),
     );
   }
-  Widget _buildItem(IconData icon, String title, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.4),
-              blurRadius: 5,
-              spreadRadius: 2,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 28, color: Colors.green),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+
+  Widget _buildProfileSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 8,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 45,
+                  backgroundColor: Colors.white,
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: AssetImage("assets/avatar.png"),
+                    onBackgroundImageError: (_, __) {},
+                  ),
                 ),
               ),
-            ),
-            Icon(Icons.arrow_forward_ios, size: 20, color: Colors.grey),
-          ],
-        ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                width: 30,
+                height: 30,
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.green,
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.camera_alt, color: Colors.white, size: 19),
+                    padding: const EdgeInsets.all(4),
+                    constraints: const BoxConstraints(),
+                    onPressed: () {
+                      print("Thêm avatar");
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Obx(
+                    () => Text(
+                  P.auth.currentUser.value?.name ?? "Unknown",
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 5),
+              Obx(
+                    () => Text(
+                  P.auth.currentUser.value?.email ?? "Unknown email",
+                  style: TextStyle(color: Colors.grey[700]),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
+  Widget _buildDivider() {
+    return Divider(
+      thickness: 1.5,
+      color: AppColors.green.withOpacity(0.7),
+      endIndent: 30,
+      indent: 30,
+    );
+  }
+
+  Widget _buildSettingItem(IconData icon, String title, VoidCallback onTap) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 3,
+      child: ListTile(
+        onTap: onTap,
+        leading: Icon(icon, size: 28, color: AppColors.green),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 20, color: Colors.grey),
+      ),
+    );
+  }
+
+  Widget _buildAccountSettings() {
+    return Column(
+      children: [
+        _buildSettingItem(Icons.person, "Edit Profile", () {
+          Get.to(EditProfilePage());
+        }),
+        _buildSettingItem(Icons.key, "Change Password", () {}),
+      ],
+    );
+  }
+
+  Widget _buildAppSettings() {
+    return Column(
+      children: [
+        _buildSettingItem(Icons.lock_clock, "Clear History", () {}),
+        _buildSettingItem(Icons.delete_forever, "Delete Account", () {}),
+        _buildSettingItem(Icons.logout, "Log Out", () {
+          P.auth.logOut();
+        }),
+      ],
+    );
+  }
 }

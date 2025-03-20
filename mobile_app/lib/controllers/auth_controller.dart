@@ -133,4 +133,35 @@ class AuthController extends GetxController {
     );
     Get.off(AuthScreen());
   }
+
+  Future<void> resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      Get.snackbar("Success", "Vui lòng kiểm tra email của bạn.");
+    } on FirebaseAuthException catch (e) {
+      print(e.message);
+      Get.snackbar("Error", "Có lỗi xảy ra: ${e.message}");
+    }
+  }
+
+  Future<void> sendOTP(String phoneNumber) async {
+    try {
+      await _auth.verifyPhoneNumber(
+        verificationCompleted: (PhoneAuthCredential credential) {},
+        codeSent: (String verificationId, int? resendToken) {
+          print("OTP sent to $phoneNumber");
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          print("Timeout: $verificationId");
+        },
+        timeout: const Duration(seconds: 60),
+        verificationFailed: (FirebaseAuthException error) {
+          print(error.toString());
+        },
+      );
+    } on FirebaseAuthException catch (e) {
+      print(e.message);
+      Get.snackbar("Error", "Có lỗi xảy ra: ${e.message}");
+    }
+  }
 }
