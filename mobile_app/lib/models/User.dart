@@ -21,5 +21,6 @@ class UserModel {
         "email": email,
         "createdAt": createdAt,
         "uid": uid,
+        "avatarUrl": avatarUrl,
       };
 }

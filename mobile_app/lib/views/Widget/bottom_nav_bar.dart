@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:mobile_app/controllers/avatar_controller.dart';
+import 'package:get/get.dart';
 
 import '../../App_Color.dart';
 import '../classification/classification_page.dart';
@@ -15,6 +16,7 @@ class myBottomNavBar extends StatefulWidget {
 }
 
 class _myBottomNavBarState extends State<myBottomNavBar> {
+  AvatarController avatarController = Get.put(AvatarController());
   int _selectedIndex = 0;
   final List<Widget> _screens = [
     HomePage(),
@@ -50,8 +52,8 @@ class _myBottomNavBarState extends State<myBottomNavBar> {
         ],
         currentIndex: _selectedIndex,
         elevation: 0,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: AppColors.green,
+        selectedItemColor: Colors.green,
+        unselectedItemColor: AppColors.gray_login_text,
         onTap: _onItemTapped,
       ),
     );

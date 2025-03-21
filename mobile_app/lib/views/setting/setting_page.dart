@@ -5,9 +5,14 @@ import 'package:mobile_app/views/setting/items_setting_page/edit_profile_page.da
 import '../../App_Color.dart';
 import '../../P.dart';
 
-class SettingPage extends StatelessWidget {
+class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
 
+  @override
+  State<SettingPage> createState() => _SettingPageState();
+}
+
+class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,11 +66,16 @@ class SettingPage extends StatelessWidget {
                 child: CircleAvatar(
                   radius: 45,
                   backgroundColor: Colors.white,
-                  child: CircleAvatar(
-                    radius: 40,
-                    backgroundImage: AssetImage("assets/avatar.png"),
-                    onBackgroundImageError: (_, __) {},
-                  ),
+                  child: Obx(() {
+                    if (P.avatar.avatarUrl.value == "") {
+                      return const Icon(Icons.account_circle, size: 80, color: Colors.black);
+                    } else {
+                      return CircleAvatar(
+                        radius: 24,
+                        backgroundImage: NetworkImage(P.avatar.avatarUrl.value),
+                      );
+                    }
+                  }),
                 ),
               ),
               Positioned(
@@ -86,11 +96,48 @@ class SettingPage extends StatelessWidget {
                     ],
                   ),
                   child: IconButton(
-                    icon: const Icon(Icons.camera_alt, color: Colors.white, size: 19),
+                    icon: const Icon(
+                      Icons.camera_alt,
+                      color: Colors.white,
+                      size: 19,
+                    ),
                     padding: const EdgeInsets.all(4),
                     constraints: const BoxConstraints(),
                     onPressed: () {
                       print("Thêm avatar");
+                      showModalBottomSheet(context: context, builder: (context) {
+                        return SafeArea(
+                          child: Container(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Card(
+                                  elevation: 2,
+                                  child: ListTile(
+                                    leading: const Icon(Icons.camera_alt),
+                                    title: const Text("Camera"),
+                                    onTap: () async {
+                                      await P.avatar.cameraAvatar();
+                                      await P.avatar.postAvatarToCloudinary();
+                                    }
+                                  ),
+                                ),
+                                Card(
+                                  elevation: 2,
+                                  child: ListTile(
+                                    leading: const Icon(Icons.image),
+                                    title: Text("Gallery"),
+                                    onTap: () async {
+                                      await P.avatar.galleryAvatar();
+                                      await P.avatar.postAvatarToCloudinary();
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        );
+                      });
                     },
                   ),
                 ),
@@ -102,14 +149,17 @@ class SettingPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Obx(
-                    () => Text(
+                () => Text(
                   P.auth.currentUser.value?.name ?? "Unknown",
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(height: 5),
               Obx(
-                    () => Text(
+                () => Text(
                   P.auth.currentUser.value?.email ?? "Unknown email",
                   style: TextStyle(color: Colors.grey[700]),
                 ),
@@ -142,7 +192,11 @@ class SettingPage extends StatelessWidget {
           title,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 20, color: Colors.grey),
+        trailing: const Icon(
+          Icons.arrow_forward_ios,
+          size: 20,
+          color: Colors.grey,
+        ),
       ),
     );
   }

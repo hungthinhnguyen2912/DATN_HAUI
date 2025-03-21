@@ -37,6 +37,7 @@ class AuthController extends GetxController {
           "email": googleUser.email,
           "createdAt": DateTime.now(),
           "uid": userCredential.user!.uid,
+          "avatarUrl": "",
         });
       }
       DocumentSnapshot userDoc =
@@ -103,7 +104,9 @@ class AuthController extends GetxController {
         email: email,
         createdAt: Timestamp.now(),
         uid: userCredential.user!.uid,
+        avatarUrl: ""
       );
+      currentUser.value = user;
       await _firestore
           .collection("User")
           .doc(userCredential.user!.uid)
