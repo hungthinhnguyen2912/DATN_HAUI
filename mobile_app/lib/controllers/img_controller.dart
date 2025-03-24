@@ -7,29 +7,13 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
-class AvatarController extends GetxController {
-  final Rx<File?> avatar = Rx<File?>(null);
+class ImageController extends GetxController {
+  final Rx<File?> image = Rx<File?>(null);
+  final RxString imageUrl = RxString("");
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final RxString avatarUrl = RxString("");
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchLinkAvatar();
-  }
-
-  Future<void> fetchLinkAvatar() async {
-    DocumentSnapshot userDoc =
-        await _firestore.collection("User").doc(_auth.currentUser!.uid).get();
-    if (userDoc.exists && userDoc.data() != null) {
-      avatarUrl.value = userDoc['avatarUrl'];
-    } else {
-      Get.snackbar("Error", "");
-    }
-  }
-
-  Future<void> galleryAvatar() async {
+  Future<void> galleryImage() async {
     final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.gallery,
     );
@@ -37,10 +21,10 @@ class AvatarController extends GetxController {
       Get.snackbar("Error", "Không có ảnh được chọn.");
       return;
     }
-    avatar.value = File(pickedFile.path);
+    image.value = File(pickedFile.path);
   }
 
-  Future<void> cameraAvatar() async {
+  Future<void> cameraImage() async {
     final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.camera,
     );
@@ -48,15 +32,16 @@ class AvatarController extends GetxController {
       Get.snackbar("Error", "No image selected.");
       return;
     }
-    avatar.value = File(pickedFile.path);
+    image.value = File(pickedFile.path);
   }
 
-  Future<void> postAvatarToCloudinary() async {
-    if (avatar.value == null) {
+  Future<void> uploadToCloudinary() async {
+    if (image.value == null) {
       print("No image selected");
       Get.snackbar("Error", "No image selected");
       return;
     }
+
     try {
       print('Start upload image to Cloudinary...');
       String cloudName = "dcqn3q7tg";
@@ -68,9 +53,9 @@ class AvatarController extends GetxController {
 
       var request = http.MultipartRequest("POST", url);
       request.fields["upload_preset"] = uploadPreset;
-      request.fields["folder"] = "Avatars";
+      request.fields["folder"] = "Vegetables";
       request.files.add(
-        await http.MultipartFile.fromPath("file", avatar.value!.path),
+        await http.MultipartFile.fromPath("file", image.value!.path),
       );
 
       var response = await request.send();
@@ -78,13 +63,8 @@ class AvatarController extends GetxController {
       var jsonResponse = json.decode(responseData);
 
       if (response.statusCode == 200) {
-        avatarUrl.value = jsonResponse["secure_url"];
-        print("Uploaded Avatar URL: ${avatarUrl.value}");
-        await _firestore.collection("User").doc(_auth.currentUser!.uid).update(
-          {
-            "avatarUrl": avatarUrl.value,
-          },
-        );
+        imageUrl.value = jsonResponse["secure_url"];
+        print("Uploaded Avatar URL: ${imageUrl.value}");
         Get.snackbar("Success", "Image uploaded successfully!");
       } else {
         Get.snackbar("Error", "Failed to upload image");
@@ -93,15 +73,5 @@ class AvatarController extends GetxController {
       Get.snackbar("Error", "An error occurred while uploading");
       print("Upload error: $e");
     }
-  }
-  // Future<String> getLinkAvatar () async {
-  //   DocumentSnapshot userDoc =
-  //       await _firestore.collection("User").doc(_auth.currentUser!.uid).get();
-  //   var currentUserAvatar = userDoc['avatarUrl'];
-  //   return currentUserAvatar;
-  // }
-
-  Future<void> putAvatarToCloudinary() async {
-
   }
 }

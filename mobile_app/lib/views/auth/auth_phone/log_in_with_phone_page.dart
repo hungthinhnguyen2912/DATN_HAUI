@@ -68,6 +68,7 @@ class LogInWithPhonePage extends StatelessWidget {
             child: ButtonAuth(
               content: "Verify phone number",
               onTap: () {
+                P.phone.sendOTP(_phoneController.text);
               },
             ),
           ),

@@ -52,7 +52,7 @@ class _myBottomNavBarState extends State<myBottomNavBar> {
         ],
         currentIndex: _selectedIndex,
         elevation: 0,
-        selectedItemColor: Colors.green,
+        selectedItemColor: AppColors.green,
         unselectedItemColor: AppColors.gray_login_text,
         onTap: _onItemTapped,
       ),

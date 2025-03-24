@@ -71,7 +71,7 @@ class _SettingPageState extends State<SettingPage> {
                       return const Icon(Icons.account_circle, size: 80, color: Colors.black);
                     } else {
                       return CircleAvatar(
-                        radius: 24,
+                        radius: 35,
                         backgroundImage: NetworkImage(P.avatar.avatarUrl.value),
                       );
                     }
