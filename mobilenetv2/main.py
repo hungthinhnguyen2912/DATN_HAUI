@@ -27,6 +27,5 @@ print(val_ds)
 
 train_classes = os.listdir("D:/datn_haui/mobilenetv2/dataset/fruits-360/Training")
 test_classes = os.listdir("D:/datn_haui/mobilenetv2/dataset/fruits-360/Test")
-
 print(train_classes)
 print(test_classes)
