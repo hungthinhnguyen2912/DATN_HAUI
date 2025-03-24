@@ -25,9 +25,8 @@ val_ds = keras.utils.image_dataset_from_directory(
 )
 print(val_ds)
 
-train_classes = sorted(os.listdir("D:/datn_haui/mobilenetv2/dataset/fruits-360/Training"))
-test_classes = sorted(os.listdir("D:/datn_haui/mobilenetv2/dataset/fruits-360/Test"))
+train_classes = os.listdir("D:/datn_haui/mobilenetv2/dataset/fruits-360/Training")
+test_classes = os.listdir("D:/datn_haui/mobilenetv2/dataset/fruits-360/Test")
 
-missing_classes = set(train_classes) - set(test_classes)
-print("Lớp bị thiếu trong tập kiểm tra:", missing_classes)
-    
+print(train_classes)
+print(test_classes)
