@@ -233,9 +233,9 @@ class ClassificationController extends GetxController {
     image = img.copyResize(image, width: 224, height: 224);
     List input = List.generate(
       1,
-      (i) => List.generate(
+          (i) => List.generate(
         224,
-        (y) => List.generate(224, (x) => List.filled(3, 0.0)),
+            (y) => List.generate(224, (x) => List.filled(3, 0.0)),
       ),
     );
 
@@ -247,9 +247,9 @@ class ClassificationController extends GetxController {
           num green = pixel.g;
           num blue = pixel.b;
 
-          input[0][y][x][0] = red.toDouble() / 255;
-          input[0][y][x][1] = green.toDouble() / 255;
-          input[0][y][x][2] = blue.toDouble() / 255;
+          input[0][y][x][0] = red.toDouble() ;
+          input[0][y][x][1] = green.toDouble() ;
+          input[0][y][x][2] = blue.toDouble() ;
         }
       }
     }

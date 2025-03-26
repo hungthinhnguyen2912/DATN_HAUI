@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
 class ImageController extends GetxController {
-  final Rx<File?> image = Rx<File?>(null);
+  late Rx<File?> image = Rx<File?>(null);
   final RxString imageUrl = RxString("");
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;

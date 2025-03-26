@@ -1,123 +1,149 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_app/App_Color.dart';
 import 'package:get/get.dart';
+import 'package:mobile_app/App_Color.dart';
 import 'package:mobile_app/components/button.dart';
 import '../../P.dart';
 import '../../models/History.dart';
 
-class ClassificationPage extends StatelessWidget {
+class ClassificationPage extends StatefulWidget {
   const ClassificationPage({super.key});
+
+  @override
+  State<ClassificationPage> createState() => _ClassificationPageState();
+}
+
+class _ClassificationPageState extends State<ClassificationPage> {
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
           "Classification",
           style: TextStyle(
-            color: AppColors.text_color,
-            fontSize: 20,
+            color: Colors.white,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: false,
+        centerTitle: true,
         backgroundColor: AppColors.green,
+        elevation: 4,
+        shadowColor: Colors.black54,
       ),
       body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              flex: 2,
-              child:
-                  P.image.image.value != null
-                      ? Obx(() {
-                        return Image.file(
-                          P.image.image.value!,
-                          width: 300,
-                          height: 300,
-                        );
-                      })
-                      : Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 300,
-                            height: 300,
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: Colors.grey, width: 2),
-                            ),
-                          ),
-                          Obx(() {
-                            return Text(
-                              "Result: ${P.classification.result.value}",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.green,
-                                fontSize: 30,
-                              ),
-                            );
-                          }),
-                        ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Obx(() {
+                return Container(
+                  width: 250,
+                  height: 250,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.grey[300],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                        offset: Offset(0, 4),
                       ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ButtonClassification(
-                    icon: Icon(Icons.image_search, color: AppColors.white),
-                    content: "Classify",
-                    onTap: () async {
-                      if (P.image.image.value == null) {
-                        Get.snackbar(
-                          "Error",
-                          "Please select an image first!",
-                          backgroundColor: Colors.red,
-                          colorText: Colors.white,
-                        );
-                        return;
-                      }
-                      await P.image.uploadToCloudinary();
-                      await P.classification.classifyImage(
-                        P.image.image.value!,
-                      );
-                      History his = History(
-                        createdAt: Timestamp.now(),
-                        kind: P.classification.result.value,
-                        imageUrl: P.image.imageUrl.value,
-                        uidUser:
-                            P.auth.currentUser.value?.name ?? "Unknown User",
-                      );
-                      await P.classification.postHistory(his);
-                    },
+                    ],
                   ),
-                  ButtonClassification(
-                    icon: Icon(Icons.upload_file, color: AppColors.white),
-                    content: "Upload picture from gallery",
-                    onTap: () {
-                      P.image.galleryImage();
-                    },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: P.image.image.value != null
+                        ? Image.file(
+                      P.image.image.value!,
+                      width: 250,
+                      height: 250,
+                      fit: BoxFit.cover,
+                    )
+                        : Center(
+                      child: Icon(
+                        Icons.image,
+                        size: 100,
+                        color: Colors.grey[600],
+                      ),
+                    ),
                   ),
-
-                  ButtonClassification(
-                    icon: Icon(Icons.camera, color: AppColors.white),
-                    content: "Take a picture",
-                    onTap: () {
-                      P.image.cameraImage();
-                    },
+                );
+              }),
+              const SizedBox(height: 20),
+              Obx(() {
+                return Text(
+                  "Result: ${P.classification.result.value}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.green,
+                    fontSize: 24,
                   ),
-                ],
-              ),
-            ),
-          ],
+                );
+              }),
+              const SizedBox(height: 30),
+              if (_isLoading)
+                CircularProgressIndicator(color: AppColors.green),
+              if (!_isLoading)
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ButtonClassification(
+                        icon: Icons.image_search,
+                        label: "Classify",
+                        onTap: () async {
+                          if (P.image.image.value == null) {
+                            Get.snackbar(
+                              "Error",
+                              "Please select an image first!",
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
+                            return;
+                          }
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          await P.image.uploadToCloudinary();
+                          await P.classification.classifyImage(P.image.image.value!);
+                          History his = History(
+                            createdAt: Timestamp.fromDate(DateTime.now()),
+                            kind: P.classification.result.value,
+                            imageUrl: P.image.imageUrl.value,
+                            uidUser: P.auth.currentUser.value?.name ?? "Unknown User",
+                          );
+                          await P.classification.postHistory(his);
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        },
+                      ),
+                      ButtonClassification(
+                        icon: Icons.upload_file,
+                        label: "Upload from Gallery",
+                        onTap: () {
+                          P.image.galleryImage();
+                        },
+                      ),
+                      ButtonClassification(
+                        icon: Icons.camera_alt,
+                        label: "Take a Picture",
+                        onTap: () {
+                          P.image.cameraImage();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
