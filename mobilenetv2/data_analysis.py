@@ -1,7 +1,6 @@
 import os
-import tensorflow as tf
-import keras
-from keras.src.layers import Rescaling
+from PIL import Image
+
 
 train_data_dir = r'D:\datn_haui\mobilenetv2\dataset\fruits-360\Training'
 val_data_dir = r'D:\datn_haui\mobilenetv2\dataset\fruits-360\Test'
@@ -22,6 +21,7 @@ for root, dirs, files in os.walk(val_data_dir):
 
 print(f"Total image: {image_count}")
 # Total image: 114226
+
 # Numbers images of each classes
 class_counts = {class_name: len(os.listdir(os.path.join(train_data_dir, class_name)))
                 for class_name in os.listdir(train_data_dir)}
@@ -39,26 +39,14 @@ class_counts = dict(sorted(class_counts.items(), key=lambda item: item[1]))
 for class_name, count in class_counts.items():
     print(f"{class_name}: {count}")
 
+image_shapes = []
+for class_name in train_classes:
+    img_path = os.path.join(train_data_dir, class_name, os.listdir(os.path.join(train_data_dir, class_name))[0])
+    img = Image.open(img_path)
+    image_shapes.append(img.size)
 
+# The number of size, and it's popularity
+from collections import Counter
+print("The image size most popular", Counter(image_shapes).most_common(5))
+# The image size most popular [((100, 100), 161), ((224, 224), 5), ((1000, 752), 1), ((1501, 1500), 1), ((612, 410), 1)]
 
-# train_data_set = keras.utils.image_dataset_from_directory(
-#     train_data_dir,
-#     image_size= (224, 224),
-#     batch_size= 64,
-#     shuffle= True,
-#     label_mode= "categorical"
-# )
-#
-# val_data_set = keras.utils.image_dataset_from_directory(
-#     val_data_dir,
-#     image_size= (224, 224),
-#     batch_size= 32,
-#     shuffle= True,
-#     label_mode= "categorical"
-# )
-#
-# normalization_layer = Rescaling(1./255)
-# train_data_set = train_data_set.map(lambda x, y: (normalization_layer(x), y))
-# val_data_set = val_data_set.map(lambda x, y: (normalization_layer(x), y))
-#
-# print(train_data_set)

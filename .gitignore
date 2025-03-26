@@ -1,1 +1,3 @@
 mobilenetv2/dataset 
+*.tfrecord
+*.tflite
