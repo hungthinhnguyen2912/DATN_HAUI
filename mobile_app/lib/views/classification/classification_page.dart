@@ -98,30 +98,30 @@ class _ClassificationPageState extends State<ClassificationPage> {
                         icon: Icons.image_search,
                         label: "Classify",
                         onTap: () async {
-                          if (P.image.image.value == null) {
-                            Get.snackbar(
-                              "Error",
-                              "Please select an image first!",
-                              backgroundColor: Colors.red,
-                              colorText: Colors.white,
-                            );
-                            return;
-                          }
-                          setState(() {
-                            _isLoading = true;
-                          });
-                          await P.image.uploadToCloudinary();
+                          // if (P.image.image.value == null) {
+                          //   Get.snackbar(
+                          //     "Error",
+                          //     "Please select an image first!",
+                          //     backgroundColor: Colors.red,
+                          //     colorText: Colors.white,
+                          //   );
+                          //   return;
+                          // }
+                          // setState(() {
+                          //   _isLoading = true;
+                          // });
+                          // await P.image.uploadToCloudinary();
                           await P.classification.classifyImage(P.image.image.value!);
-                          History his = History(
-                            createdAt: Timestamp.fromDate(DateTime.now()),
-                            kind: P.classification.result.value,
-                            imageUrl: P.image.imageUrl.value,
-                            uidUser: P.auth.currentUser.value?.name ?? "Unknown User",
-                          );
-                          await P.classification.postHistory(his);
-                          setState(() {
-                            _isLoading = false;
-                          });
+                          // History his = History(
+                          //   createdAt: Timestamp.fromDate(DateTime.now()),
+                          //   kind: P.classification.result.value,
+                          //   imageUrl: P.image.imageUrl.value,
+                          //   uidUser: P.auth.currentUser.value?.name ?? "Unknown User",
+                          // );
+                          // await P.classification.postHistory(his);
+                          // setState(() {
+                          //   _isLoading = false;
+                          // });
                         },
                       ),
                       ButtonClassification(
