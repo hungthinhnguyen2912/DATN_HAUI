@@ -117,8 +117,13 @@ class _SettingPageState extends State<SettingPage> {
                                     leading: const Icon(Icons.camera_alt),
                                     title: const Text("Camera"),
                                     onTap: () async {
-                                      await P.avatar.cameraAvatar();
-                                      await P.avatar.postAvatarToCloudinary();
+                                      if(P.avatar.avatarUrl.value == "") {
+                                        await P.avatar.cameraAvatar();
+                                        await P.avatar.postCloudinary();
+                                      } else {
+                                        await P.avatar.cameraAvatar();
+                                        await P.avatar.DeleteAndPostCloudinary();
+                                      }
                                     }
                                   ),
                                 ),
@@ -128,8 +133,13 @@ class _SettingPageState extends State<SettingPage> {
                                     leading: const Icon(Icons.image),
                                     title: Text("Gallery"),
                                     onTap: () async {
-                                      await P.avatar.galleryAvatar();
-                                      await P.avatar.postAvatarToCloudinary();
+                                      if(P.avatar.avatarUrl.value == "") {
+                                        await P.avatar.galleryAvatar();
+                                        await P.avatar.postCloudinary();
+                                      } else {
+                                        await P.avatar.galleryAvatar();
+                                        await P.avatar.DeleteAndPostCloudinary();
+                                      }
                                     },
                                   ),
                                 )

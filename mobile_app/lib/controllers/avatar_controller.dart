@@ -1,17 +1,21 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:crypto/crypto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:cloudinary/cloudinary.dart';
+import '../P.dart';
 
 class AvatarController extends GetxController {
   final Rx<File?> avatar = Rx<File?>(null);
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final RxString avatarUrl = RxString("");
+  final RxString publicId = RxString("");
+
 
   @override
   void onInit() {
@@ -24,6 +28,7 @@ class AvatarController extends GetxController {
         await _firestore.collection("User").doc(_auth.currentUser!.uid).get();
     if (userDoc.exists && userDoc.data() != null) {
       avatarUrl.value = userDoc['avatarUrl'];
+      publicId.value = userDoc['publicIdAvatar'];
     } else {
       Get.snackbar("Error", "");
     }
@@ -51,57 +56,49 @@ class AvatarController extends GetxController {
     avatar.value = File(pickedFile.path);
   }
 
-  Future<void> postAvatarToCloudinary() async {
+  Future<void> postCloudinary() async {
     if (avatar.value == null) {
       print("No image selected");
       Get.snackbar("Error", "No image selected");
       return;
     }
     try {
-      print('Start upload image to Cloudinary...');
-      String cloudName = "dcqn3q7tg";
-      String uploadPreset = "Vegetable";
-
-      Uri url = Uri.parse(
-        "https://api.cloudinary.com/v1_1/$cloudName/image/upload",
+      var response = await P.cloudinary.upload(
+        file: File(avatar.value!.path).path,
+        resourceType: CloudinaryResourceType.image,
+        folder: "Avatars",
+        fileName: "user_avatars_${_auth.currentUser!.uid}",
+        progressCallback: (count, total) {
+          print("Upload avatar success with progress: $count/$total");
+        },
       );
-
-      var request = http.MultipartRequest("POST", url);
-      request.fields["upload_preset"] = uploadPreset;
-      request.fields["folder"] = "Avatars";
-      request.files.add(
-        await http.MultipartFile.fromPath("file", avatar.value!.path),
-      );
-
-      var response = await request.send();
-      var responseData = await response.stream.bytesToString();
-      var jsonResponse = json.decode(responseData);
-
-      if (response.statusCode == 200) {
-        avatarUrl.value = jsonResponse["secure_url"];
+      if (response.isSuccessful) {
+        avatarUrl.value = response.secureUrl ?? "";
+        publicId.value = response.publicId ?? "";
         print("Uploaded Avatar URL: ${avatarUrl.value}");
-        await _firestore.collection("User").doc(_auth.currentUser!.uid).update(
-          {
-            "avatarUrl": avatarUrl.value,
-          },
-        );
-        Get.snackbar("Success", "Image uploaded successfully!");
+        await _firestore.collection("User").doc(_auth.currentUser!.uid).update({
+          "avatarUrl": avatarUrl.value,
+          "publicIdAvatar": publicId.value,
+        });
+        Get.snackbar("Success", "Avatar upload complete");
       } else {
-        Get.snackbar("Error", "Failed to upload image");
+        print("Error upload image");
       }
     } catch (e) {
-      Get.snackbar("Error", "An error occurred while uploading");
-      print("Upload error: $e");
+      print("Lỗi post Cloudinary: ${e.toString()}");
     }
   }
-  // Future<String> getLinkAvatar () async {
-  //   DocumentSnapshot userDoc =
-  //       await _firestore.collection("User").doc(_auth.currentUser!.uid).get();
-  //   var currentUserAvatar = userDoc['avatarUrl'];
-  //   return currentUserAvatar;
-  // }
 
-  Future<void> putAvatarToCloudinary() async {
-
+  Future<void> DeleteAndPostCloudinary() async {
+    try {
+      P.cloudinary.destroy(
+        publicId.value,
+        resourceType: CloudinaryResourceType.image,
+        invalidate: false,
+      );
+    } catch (e) {
+      print("Lỗi delete: ${e.toString()}");
+    }
+    postCloudinary();
   }
 }

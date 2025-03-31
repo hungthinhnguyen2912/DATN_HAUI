@@ -38,6 +38,7 @@ class AuthController extends GetxController {
           "createdAt": DateTime.now(),
           "uid": userCredential.user!.uid,
           "avatarUrl": "",
+          "publicIdAvatar": "",
         });
       }
       DocumentSnapshot userDoc =
@@ -55,6 +56,10 @@ class AuthController extends GetxController {
               userDoc.data().toString().contains('avatarUrl')
                   ? userDoc['avatarUrl']
                   : "",
+          publicIdAvatar:
+          userDoc.data().toString().contains('publicId')
+              ? userDoc['publicIdAvatar']
+              : "",
         );
       }
       Get.off(myBottomNavBar());
@@ -85,6 +90,10 @@ class AuthController extends GetxController {
               userDoc.data().toString().contains('avatarUrl')
                   ? userDoc['avatarUrl']
                   : "",
+          publicIdAvatar:
+              userDoc.data().toString().contains('publicId')
+                  ? userDoc['publicIdAvatar']
+                  : "",
         );
         Get.off(myBottomNavBar());
       } else {
@@ -104,7 +113,8 @@ class AuthController extends GetxController {
         email: email,
         createdAt: Timestamp.now(),
         uid: userCredential.user!.uid,
-        avatarUrl: ""
+        avatarUrl: "",
+        publicIdAvatar: "",
       );
       currentUser.value = user;
       await _firestore
@@ -146,6 +156,4 @@ class AuthController extends GetxController {
       Get.snackbar("Error", "Có lỗi xảy ra: ${e.message}");
     }
   }
-
-
 }

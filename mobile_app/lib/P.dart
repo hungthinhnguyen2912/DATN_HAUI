@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloudinary/cloudinary.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:mobile_app/controllers/auth_phone_controller.dart';
@@ -15,6 +16,12 @@ class P {
     Get.put(ImageController());
     Get.put(ClassificationController());
   }
+  static final cloudinary = Cloudinary.signedConfig(
+    apiKey: "328643715299492",
+    apiSecret: "PPjRIC_NRfOkxb5kXqkmvKSjbeg",
+    cloudName: "graduation",
+  );
+
   static FirebaseAuth get authFirebase => FirebaseAuth.instance;
   static FirebaseFirestore get fireStore => FirebaseFirestore.instance;
   static AuthController get auth  => Get.find();
