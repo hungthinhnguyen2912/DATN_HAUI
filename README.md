@@ -7,6 +7,7 @@ This project is used for graduation at Hanoi University of Industry.
 - **March 18, 2025**: I made a decision on the topic and am waiting for my lecturer to review it.
 - **March 20, 2025**: My topic gradution project is Research and application of the MobileNetV2 model on mobile platforms for the classification vegetables and fruits.
 - **March 24, 2025**: I have problem with dataset. The number of image in each class have difference with its.
+- **March 29, 2025**: Report project to lecturer first time, I must report twice a month 
 ## Planning for project 
 - **March 20, 2025 - March 29,2025**: UI, Logic for Mobile App (Flutter)
 - **March 30, 2025 - May 4,2025**: Train model MobileNetV2, Test model
