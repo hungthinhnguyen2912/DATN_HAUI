@@ -2,16 +2,20 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloudinary/cloudinary.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+
+import '../P.dart';
 
 class ImageController extends GetxController {
   late Rx<File?> image = Rx<File?>(null);
   final RxString imageUrl = RxString("");
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  RxString publicId = "".obs;
 
   Future<void> galleryImage() async {
     final pickedFile = await ImagePicker().pickImage(
@@ -35,43 +39,34 @@ class ImageController extends GetxController {
     image.value = File(pickedFile.path);
   }
 
-  Future<void> uploadToCloudinary() async {
+  Future<void> postImgCloudinary() async {
     if (image.value == null) {
       print("No image selected");
       Get.snackbar("Error", "No image selected");
       return;
     }
-
     try {
       print('Start upload image to Cloudinary...');
-      String cloudName = "dcqn3q7tg";
-      String uploadPreset = "Vegetable";
-
-      Uri url = Uri.parse(
-        "https://api.cloudinary.com/v1_1/$cloudName/image/upload",
+      var response = await P.cloudinary.upload(
+        file: File(image.value!.path).path,
+        resourceType: CloudinaryResourceType.image,
+        folder: "Vegetables",
+        progressCallback: (count, total) {
+          print("Upload image success with progress: $count/$total");
+        },
       );
-
-      var request = http.MultipartRequest("POST", url);
-      request.fields["upload_preset"] = uploadPreset;
-      request.fields["folder"] = "Vegetables";
-      request.files.add(
-        await http.MultipartFile.fromPath("file", image.value!.path),
-      );
-
-      var response = await request.send();
-      var responseData = await response.stream.bytesToString();
-      var jsonResponse = json.decode(responseData);
-
-      if (response.statusCode == 200) {
-        imageUrl.value = jsonResponse["secure_url"];
-        print("Uploaded Avatar URL: ${imageUrl.value}");
-        Get.snackbar("Success", "Image uploaded successfully!");
+      if (response.isSuccessful) {
+        imageUrl.value = response.secureUrl ?? "";
+        publicId.value = response.publicId ?? "";
+        print("Uploaded Image URL: ${imageUrl.value}");
+        Get.snackbar("Success", "Image upload complete");
       } else {
-        Get.snackbar("Error", "Failed to upload image");
+        print("Error upload image");
       }
     } catch (e) {
       Get.snackbar("Error", "An error occurred while uploading");
-      print("Upload error: $e");
+      print("Lỗi upload: $e");
     }
   }
+
 }

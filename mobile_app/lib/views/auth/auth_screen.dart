@@ -19,18 +19,16 @@ class _AuthScreenState extends State<AuthScreen> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: AppColors.white,
-          elevation: 0, // Bỏ bóng để giao diện sạch hơn
-          title: Text("Authentication", style: TextStyle(color: AppColors.black, fontWeight: FontWeight.bold)),
-          centerTitle: true,
+          elevation: 0,
           bottom: TabBar(
             tabs: [
               Tab(text: "Log In"),
               Tab(text: "Register"),
             ],
-            labelColor: AppColors.green, // Màu chữ khi được chọn
-            unselectedLabelColor: Colors.grey, // Màu chữ khi chưa chọn
-            indicatorColor: AppColors.black, // Màu gạch chân tab
-            indicatorWeight: 3, // Độ dày của indicator
+            labelColor: AppColors.green,
+            unselectedLabelColor: Colors.grey,
+            indicatorColor: AppColors.black,
+            indicatorWeight: 3,
           ),
         ),
         body: TabBarView(

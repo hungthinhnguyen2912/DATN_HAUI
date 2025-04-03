@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_app/App_Color.dart';
 import 'package:mobile_app/components/button.dart';
+import 'package:mobile_app/controllers/img_controller.dart';
 import '../../P.dart';
 import '../../models/History.dart';
 
@@ -29,7 +30,7 @@ class _ClassificationPageState extends State<ClassificationPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: true,
+        centerTitle: false,
         backgroundColor: AppColors.green,
         elevation: 4,
         shadowColor: Colors.black54,
@@ -58,20 +59,21 @@ class _ClassificationPageState extends State<ClassificationPage> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: P.image.image.value != null
-                        ? Image.file(
-                      P.image.image.value!,
-                      width: 250,
-                      height: 250,
-                      fit: BoxFit.cover,
-                    )
-                        : Center(
-                      child: Icon(
-                        Icons.image,
-                        size: 100,
-                        color: Colors.grey[600],
-                      ),
-                    ),
+                    child:
+                        P.image.image.value != null
+                            ? Image.file(
+                              P.image.image.value!,
+                              width: 250,
+                              height: 250,
+                              fit: BoxFit.cover,
+                            )
+                            : Center(
+                              child: Icon(
+                                Icons.image,
+                                size: 100,
+                                color: Colors.grey[600],
+                              ),
+                            ),
                   ),
                 );
               }),
@@ -87,8 +89,7 @@ class _ClassificationPageState extends State<ClassificationPage> {
                 );
               }),
               const SizedBox(height: 30),
-              if (_isLoading)
-                CircularProgressIndicator(color: AppColors.green),
+              if (_isLoading) CircularProgressIndicator(color: AppColors.green),
               if (!_isLoading)
                 Expanded(
                   child: Column(
@@ -98,30 +99,34 @@ class _ClassificationPageState extends State<ClassificationPage> {
                         icon: Icons.image_search,
                         label: "Classify",
                         onTap: () async {
-                          // if (P.image.image.value == null) {
-                          //   Get.snackbar(
-                          //     "Error",
-                          //     "Please select an image first!",
-                          //     backgroundColor: Colors.red,
-                          //     colorText: Colors.white,
-                          //   );
-                          //   return;
-                          // }
-                          // setState(() {
-                          //   _isLoading = true;
-                          // });
-                          // await P.image.uploadToCloudinary();
-                          await P.classification.classifyImage(P.image.image.value!);
-                          // History his = History(
-                          //   createdAt: Timestamp.fromDate(DateTime.now()),
-                          //   kind: P.classification.result.value,
-                          //   imageUrl: P.image.imageUrl.value,
-                          //   uidUser: P.auth.currentUser.value?.name ?? "Unknown User",
-                          // );
-                          // await P.classification.postHistory(his);
-                          // setState(() {
-                          //   _isLoading = false;
-                          // });
+                          if (P.image.image.value == null) {
+                            Get.snackbar(
+                              "Error",
+                              "Please select an image first!",
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
+                            return;
+                          }
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          await P.image.postImgCloudinary();
+                          await P.classification.classifyImage(
+                            P.image.image.value!,
+                          );
+                          History his = History(
+                            createdAt: Timestamp.fromDate(DateTime.now()),
+                            kind: P.classification.result.value,
+                            imageUrl: P.image.imageUrl.value,
+                            uidUser:
+                                P.auth.currentUser.value?.uid ?? "Unknown User",
+                            publicId: P.image.publicId.value,
+                          );
+                          await P.classification.postHistory(his);
+                          setState(() {
+                            _isLoading = false;
+                          });
                         },
                       ),
                       ButtonClassification(

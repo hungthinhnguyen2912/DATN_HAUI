@@ -57,9 +57,9 @@ class AuthController extends GetxController {
                   ? userDoc['avatarUrl']
                   : "",
           publicIdAvatar:
-          userDoc.data().toString().contains('publicId')
-              ? userDoc['publicIdAvatar']
-              : "",
+              userDoc.data().toString().contains('publicId')
+                  ? userDoc['publicIdAvatar']
+                  : "",
         );
       }
       Get.off(myBottomNavBar());
@@ -144,7 +144,7 @@ class AuthController extends GetxController {
       createdAt: Timestamp(0, 0),
       avatarUrl: "",
     );
-    Get.off(AuthScreen());
+    Get.offAll(() => AuthScreen());
   }
 
   Future<void> resetPassword(String email) async {
