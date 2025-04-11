@@ -5,15 +5,14 @@ import random
 from PIL import Image
 import numpy as np
 
-# Đường dẫn TFRecord và dataset gốc
 TFRECORD_FILE = "tfrecodrd_file\\train_data.tfrecord"
 DATA_DIR = "D:\\datn_haui\\new_model\\dataset\\fruits-360\\Training"
 
-# Đọc số lượng mẫu
+# Đếm tổng số mẫu trong TFRecord
 count = sum(1 for _ in tf.data.TFRecordDataset(TFRECORD_FILE))
 print(f"📊 TFRecord chứa {count} mẫu.")
 
-# Hàm parse TFRecord
+# Hàm phân tích TFRecord
 def parse_example(example):
     feature_description = {
         'image': tf.io.FixedLenFeature([], tf.string),
@@ -22,28 +21,57 @@ def parse_example(example):
     example = tf.io.parse_single_example(example, feature_description)
     image = tf.io.decode_jpeg(example['image'], channels=3)
     image = tf.image.convert_image_dtype(image, tf.float32)
+    image = tf.reverse(image, axis=[-1])  # Chuyển từ BGR sang RGB
     label = example['label']
     return image, label
 
-# Load TFRecord dataset và shuffle
+# Đọc dataset
 dataset = tf.data.TFRecordDataset(TFRECORD_FILE)
-dataset = dataset.map(parse_example).shuffle(3000)
+dataset = dataset.map(parse_example)
 
-# Chọn 5 ảnh ngẫu nhiên
+# Đếm số lượng mẫu cho mỗi nhãn
+label_counts = {}
+for _, label in dataset:
+    label = label.numpy()
+    label_counts[label] = label_counts.get(label, 0) + 1
+
+# Sắp xếp nhãn để vẽ biểu đồ
+labels = sorted(label_counts.keys())
+counts = [label_counts[label] for label in labels]
+num_classes = len(labels)
+
+# Vẽ biểu đồ phân bố số lượng mẫu
+plt.figure(figsize=(12, 6))
+# Vẽ histogram và lấy các đối tượng patches
+hist, bins, patches = plt.hist(labels, bins=num_classes, weights=counts, edgecolor='black')
+
+# Áp dụng màu gradient cho từng cột
+colors = plt.cm.viridis(np.linspace(0, 1, len(patches)))
+for patch, color in zip(patches, colors):
+    patch.set_facecolor(color)
+
+plt.title(f"Dataset Distribution ({num_classes} Classes)")
+plt.xlabel("Class (Encoded)")
+plt.ylabel("Number of Images")
+plt.show()
+
+# Xáo trộn và lấy 5 mẫu ngẫu nhiên để hiển thị
+dataset = dataset.shuffle(buffer_size=count, reshuffle_each_iteration=True)
 samples = list(dataset.take(5))
-
-# Tạo danh sách để tìm ảnh gốc
 selected_labels = [label.numpy() for _, label in samples]
 
-# Duyệt qua thư mục dataset để tìm ảnh tương ứng
+# Tìm ảnh gốc
 def find_original_images(selected_labels, data_dir):
     original_images = []
-    class_dirs = sorted(os.listdir(data_dir))  # Sắp xếp class theo thứ tự label
+    class_dirs = sorted(os.listdir(data_dir))
     for label in selected_labels:
-        class_name = class_dirs[label]  # Tìm thư mục theo index label
+        class_name = class_dirs[label]
         class_path = os.path.join(data_dir, class_name)
-        img_files = os.listdir(class_path)
-        random_img = random.choice(img_files)  # Chọn 1 ảnh bất kỳ trong class đó
+        img_files = [f for f in os.listdir(class_path) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+        if not img_files:
+            print(f"Warning: No valid images found in {class_path}")
+            continue
+        random_img = random.choice(img_files)
         img_path = os.path.join(class_path, random_img)
         original_images.append((Image.open(img_path), label))
     return original_images
