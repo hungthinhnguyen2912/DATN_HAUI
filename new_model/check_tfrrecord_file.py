@@ -8,11 +8,9 @@ import numpy as np
 TFRECORD_FILE = "tfrecodrd_file\\train_data.tfrecord"
 DATA_DIR = "D:\\datn_haui\\new_model\\dataset\\fruits-360\\Training"
 
-# Đếm tổng số mẫu trong TFRecord
 count = sum(1 for _ in tf.data.TFRecordDataset(TFRECORD_FILE))
 print(f"📊 TFRecord chứa {count} mẫu.")
 
-# Hàm phân tích TFRecord
 def parse_example(example):
     feature_description = {
         'image': tf.io.FixedLenFeature([], tf.string),
@@ -21,7 +19,7 @@ def parse_example(example):
     example = tf.io.parse_single_example(example, feature_description)
     image = tf.io.decode_jpeg(example['image'], channels=3)
     image = tf.image.convert_image_dtype(image, tf.float32)
-    image = tf.reverse(image, axis=[-1])  # Chuyển từ BGR sang RGB
+    # image = tf.reverse(image, axis=[-1])  # Chuyển từ BGR sang RGB
     label = example['label']
     return image, label
 
@@ -29,23 +27,18 @@ def parse_example(example):
 dataset = tf.data.TFRecordDataset(TFRECORD_FILE)
 dataset = dataset.map(parse_example)
 
-# Đếm số lượng mẫu cho mỗi nhãn
 label_counts = {}
 for _, label in dataset:
     label = label.numpy()
     label_counts[label] = label_counts.get(label, 0) + 1
 
-# Sắp xếp nhãn để vẽ biểu đồ
 labels = sorted(label_counts.keys())
 counts = [label_counts[label] for label in labels]
 num_classes = len(labels)
 
-# Vẽ biểu đồ phân bố số lượng mẫu
 plt.figure(figsize=(12, 6))
-# Vẽ histogram và lấy các đối tượng patches
 hist, bins, patches = plt.hist(labels, bins=num_classes, weights=counts, edgecolor='black')
 
-# Áp dụng màu gradient cho từng cột
 colors = plt.cm.viridis(np.linspace(0, 1, len(patches)))
 for patch, color in zip(patches, colors):
     patch.set_facecolor(color)
@@ -55,7 +48,6 @@ plt.xlabel("Class (Encoded)")
 plt.ylabel("Number of Images")
 plt.show()
 
-# Xáo trộn và lấy 5 mẫu ngẫu nhiên để hiển thị
 dataset = dataset.shuffle(buffer_size=count, reshuffle_each_iteration=True)
 samples = list(dataset.take(5))
 selected_labels = [label.numpy() for _, label in samples]

@@ -1,44 +1,45 @@
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-import keras
+path = r"tfrecodrd_file\\train_data.tfrecord"
 
-TFRECORD_FILE = "tfrecodrd_file\\train_data.tfrecord"
 
-# Đếm tổng số mẫu
-count = sum(1 for _ in tf.data.TFRecordDataset(TFRECORD_FILE))
-print(f"📊 TFRecord chứa {count} mẫu.")
-
-def parse_and_preprocess(example):
+# Hàm parse tfrecord (giả sử bạn lưu ảnh dưới dạng raw bytes)
+def _parse_function(proto):
+    # Tùy thuộc vào cấu trúc bạn đã dùng để tạo TFRecord
     feature_description = {
         'image': tf.io.FixedLenFeature([], tf.string),
-        'label': tf.io.FixedLenFeature([], tf.int64),
+        # thêm label nếu cần
     }
-    example = tf.io.parse_single_example(example, feature_description)
-    image = tf.io.decode_jpeg(example['image'], channels=3)
-    image = tf.image.convert_image_dtype(image, tf.float32)
-    image = tf.reverse(image, axis=[-1])
-    image = keras.applications.mobilenet_v2.preprocess_input(image * 255.0)
-    label = example['label']
-    return image, label
+    parsed_features = tf.io.parse_single_example(proto, feature_description)
+    image = tf.io.decode_jpeg(parsed_features['image'], channels=3)  # hoặc decode_png
+    return image
 
 
-# Đọc dataset
-dataset = tf.data.TFRecordDataset(TFRECORD_FILE)
-dataset = dataset.map(parse_and_preprocess, num_parallel_calls=tf.data.AUTOTUNE)
+# Đọc file TFRecord
+raw_dataset = tf.data.TFRecordDataset(path)
+parsed_dataset = raw_dataset.map(_parse_function)
 
-train_size = int(0.8 * count)
-val_size = count - train_size
+# Lấy 1 ảnh mẫu ra
+for image in parsed_dataset.take(1):
+    img_tensor = image.numpy()
+    break
+# In giá trị pixel đầu tiên
+print("Pixel đầu tiên (H x W x C):", img_tensor[0, 0])
+# Bản gốc (decode trực tiếp)
+plt.subplot(1, 2, 1)
+plt.imshow(img_tensor)
+plt.title("Ảnh gốc decode")
 
-train_dataset = dataset.take(train_size)
-val_dataset = dataset.skip(train_size)
+# Đảo kênh (BGR → RGB)
+img_rgb = img_tensor[..., ::-1]
+plt.subplot(1, 2, 2)
+plt.imshow(img_rgb)
+plt.title("Đảo màu (BGR → RGB)")
 
-BATCH_SIZE = 32
-steps_per_epoch = train_size // BATCH_SIZE
-validation_steps = val_size // BATCH_SIZE
+plt.show()
 
-train_dataset = train_dataset.shuffle(buffer_size=min(train_size, 10000)).batch(BATCH_SIZE).repeat().prefetch(tf.data.AUTOTUNE)
-val_dataset = val_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
-
-for image, label in val_dataset.take(1):
-    print(image.shape, label.numpy())
+# Hoặc xem thử ảnh bằng matplotlib
+plt.imshow(img_tensor)
+plt.title("Check Color Order")
+plt.show()

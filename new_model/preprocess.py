@@ -60,7 +60,7 @@ def process_image(img_path, augment=False):
         image = augment_image(image, img_path)
         if image is None:
             return None
-    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)  # Chuyển lại sang BGR trước khi mã hóa
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     _, image_encoded = cv2.imencode('.jpg', image)
     return image_encoded.tobytes()
 

@@ -51,7 +51,6 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
-  /// 🎨 Thiết kế giao diện Profile Section
   Widget _buildProfileSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
