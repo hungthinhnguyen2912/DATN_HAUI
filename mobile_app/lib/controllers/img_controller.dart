@@ -68,5 +68,9 @@ class ImageController extends GetxController {
       print("Lỗi upload: $e");
     }
   }
-
+  void clearImage() {
+    image.value = null;
+    imageUrl.value = '';
+    publicId.value = '';
+  }
 }

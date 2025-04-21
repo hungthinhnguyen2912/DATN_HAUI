@@ -52,7 +52,6 @@ dataset = dataset.shuffle(buffer_size=count, reshuffle_each_iteration=True)
 samples = list(dataset.take(5))
 selected_labels = [label.numpy() for _, label in samples]
 
-# Tìm ảnh gốc
 def find_original_images(selected_labels, data_dir):
     original_images = []
     class_dirs = sorted(os.listdir(data_dir))
@@ -68,10 +67,8 @@ def find_original_images(selected_labels, data_dir):
         original_images.append((Image.open(img_path), label))
     return original_images
 
-# Lấy ảnh gốc
 original_images = find_original_images(selected_labels, DATA_DIR)
 
-# Hiển thị ảnh từ TFRecord
 plt.figure(figsize=(10, 5))
 for i, (image, label) in enumerate(samples):
     plt.subplot(2, 5, i + 1)
@@ -79,7 +76,6 @@ for i, (image, label) in enumerate(samples):
     plt.axis("off")
     plt.title(f"TFRecord Label: {label.numpy()}")
 
-# Hiển thị ảnh gốc dưới ảnh từ TFRecord
 for i, (image, label) in enumerate(original_images):
     plt.subplot(2, 5, i + 6)
     plt.imshow(np.array(image))

@@ -48,6 +48,7 @@ dependencies:
   cloudinary: ^1.2.0
   flutter_launcher_icons: ^0.14.3
   intl: ^0.20.2
+  carousel_slider: ^5.0.0
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
@@ -86,6 +87,24 @@ flutter:
     - assets/google.png
     - assets/tflite/
     - assets/icon/icon.png
+    - assets/vegetable.json
+    - assets/images/
+    - assets/images/Real Bean/
+    - assets/images/Real Bitter_Gourd/
+    - assets/images/Real Bottle_Gourd/
+    - assets/images/Real Brinjal/
+    - assets/images/Real Broccoli/
+    - assets/images/Real Cabbage/
+    - assets/images/Real Carrot/
+    - assets/images/Real Cauliflower/
+    - assets/images/Real Carrot/
+    - assets/images/Real Capsicum/
+    - assets/images/Real Cucumber/
+    - assets/images/Real Papaya/
+    - assets/images/Real Potato/
+    - assets/images/Real Pumpkin/
+    - assets/images/Real Radish/
+    - assets/images/Real Tomato/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

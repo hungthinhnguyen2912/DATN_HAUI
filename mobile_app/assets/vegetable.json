@@ -1,0 +1,93 @@
+[
+  {
+    "name": "Bean",
+    "title": "Đậu",
+    "subtitle": "Đậu chứa nhiều protein, chất xơ và vitamin, là nguồn thực phẩm quan trọng trong bữa ăn hàng ngày.",
+    "imageUrl": "assets/images/Bean.png",
+    "detail": "Đậu là nguồn cung cấp protein thực vật tuyệt vời, giàu chất xơ, vitamin và khoáng chất. Chúng giúp kiểm soát đường huyết, hỗ trợ tiêu hóa và tăng cường sức khỏe tim mạch. Đậu còn giúp duy trì cân nặng và cung cấp năng lượng bền vững."
+  },
+  {
+    "name": "Bitter_Gourd",
+    "title": "Mướp đắng",
+    "subtitle": "Mướp đắng có vị đắng đặc trưng, giúp giảm đường huyết, thanh nhiệt và hỗ trợ tiêu hóa tốt.",
+    "imageUrl": "assets/images/Bitter_Gourd.png",
+    "detail": "Mướp đắng nổi tiếng với tác dụng hạ đường huyết, rất tốt cho người bị tiểu đường. Nó còn giúp thanh nhiệt, giải độc, tăng cường hệ miễn dịch và cải thiện chức năng tiêu hóa. Loại quả này chứa nhiều chất chống oxy hóa giúp ngăn ngừa lão hóa và bệnh tật."
+  },
+  {
+    "name": "Bottle_Gourd",
+    "title": "Bầu",
+    "subtitle": "Quả bầu chứa nhiều nước, ít calo, có tác dụng thanh nhiệt, giải độc và hỗ trợ giảm cân.",
+    "imageUrl": "assets/images/Bottle_Gourd.png",
+    "detail": "Bầu là một loại rau củ có hàm lượng nước cao, giúp thanh nhiệt, giải độc và hỗ trợ tiêu hóa. Nó có ít calo nhưng lại giàu vitamin C, kali và chất xơ. Bầu thường được dùng trong các món canh thanh mát, giúp kiểm soát cân nặng và tốt cho tim mạch."
+  },
+  {
+    "name": "Brinjal",
+    "title": "Cà tím",
+    "subtitle": "Cà tím giàu chất chống oxy hóa, giúp bảo vệ tim mạch, cải thiện tiêu hóa và tốt cho da.",
+    "imageUrl": "assets/images/Brinjal.png",
+    "detail": "Cà tím chứa nhiều chất chống oxy hóa, đặc biệt là anthocyanin giúp bảo vệ tế bào khỏi tổn thương. Nó cũng giàu chất xơ giúp hỗ trợ tiêu hóa và kiểm soát cholesterol. Cà tím còn giúp giảm viêm, bảo vệ tim mạch và cải thiện sức khỏe da."
+  },
+  {
+    "name": "Broccoli",
+    "title": "Bông cải xanh",
+    "subtitle": "Bông cải xanh chứa nhiều vitamin C, K, chất xơ và chất chống oxy hóa giúp tăng cường sức khỏe.",
+    "imageUrl": "assets/images/Broccoli.png",
+    "detail": "Bông cải xanh là một siêu thực phẩm giàu vitamin C, K, folate và chất xơ. Nó giúp tăng cường miễn dịch, hỗ trợ tiêu hóa và bảo vệ sức khỏe tim mạch. Ngoài ra, các hợp chất chống oxy hóa trong bông cải xanh còn giúp giảm nguy cơ ung thư."
+  },
+  {
+    "name": "Cabbage",
+    "title": "Bắp cải",
+    "subtitle": "Bắp cải giàu chất xơ, vitamin K và C, giúp tăng cường hệ miễn dịch và bảo vệ hệ tiêu hóa.",
+    "imageUrl": "assets/images/Cabbage.png",
+    "detail": "Bắp cải chứa nhiều chất dinh dưỡng quan trọng như vitamin K, C và chất xơ. Nó giúp cải thiện hệ tiêu hóa, tăng cường miễn dịch và giảm nguy cơ mắc các bệnh mãn tính. Bắp cải cũng giúp thanh lọc cơ thể và hỗ trợ giảm cân."
+  },
+  {
+    "name": "Capsicum",
+    "title": "Ớt chuông",
+    "subtitle": "Ớt chuông có nhiều màu sắc bắt mắt, chứa chất chống oxy hóa giúp tăng cường miễn dịch và đẹp da.",
+    "imageUrl": "assets/images/Capsicum.png",
+    "detail": "Ớt chuông giàu vitamin C, A và các chất chống oxy hóa giúp tăng cường miễn dịch. Nó cũng hỗ trợ giảm viêm, cải thiện sức khỏe da và bảo vệ tim mạch. Hơn nữa, ớt chuông chứa ít calo, phù hợp với người ăn kiêng."
+  },
+  {
+    "name": "Carrot",
+    "title": "Cà rốt",
+    "subtitle": "Cà rốt giàu beta-carotene, giúp tăng cường thị lực, cải thiện hệ miễn dịch và làm đẹp da.",
+    "imageUrl": "assets/images/Carrot.png",
+    "detail": "Cà rốt là nguồn cung cấp beta-carotene dồi dào, giúp tăng cường thị lực và bảo vệ mắt. Ngoài ra, nó còn chứa nhiều vitamin A, C và chất xơ, hỗ trợ tiêu hóa và làm đẹp da. Cà rốt cũng giúp giảm nguy cơ mắc bệnh tim mạch."
+  },
+  {
+    "name": "Cauliflower",
+    "title": "Súp lơ",
+    "subtitle": "Súp lơ giàu vitamin C, chất xơ và chất chống oxy hóa, giúp bảo vệ cơ thể khỏi ung thư.",
+    "imageUrl": "assets/images/Cauliflower.png",
+    "detail": "Súp lơ chứa nhiều hợp chất chống oxy hóa giúp giảm viêm và ngăn ngừa ung thư. Nó cũng giàu vitamin C, chất xơ và khoáng chất, hỗ trợ hệ tiêu hóa và tăng cường miễn dịch. Súp lơ còn giúp kiểm soát cân nặng hiệu quả."
+  },
+  {
+    "name": "Cucumber",
+    "title": "Dưa leo",
+    "subtitle": "Dưa leo chứa nhiều nước, giúp làm mát cơ thể, cung cấp độ ẩm cho da và hỗ trợ giảm cân.",
+    "imageUrl": "assets/images/Cucumber.png",
+    "detail": "Dưa leo có hàm lượng nước cao, giúp cấp ẩm và thanh lọc cơ thể. Nó chứa ít calo, giàu vitamin K và chất chống oxy hóa, tốt cho da và hệ tiêu hóa. Dưa leo cũng giúp kiểm soát huyết áp và hỗ trợ giảm cân."
+  },
+  {
+    "name": "Papaya",
+    "title": "Đu đủ",
+    "subtitle": "Đu đủ giàu enzyme papain, giúp tiêu hóa tốt, tăng cường miễn dịch và làm đẹp da.",
+    "imageUrl": "assets/images/Papaya.png",
+    "detail": "Đu đủ chứa nhiều enzyme papain giúp hỗ trợ tiêu hóa, giảm táo bón. Nó cũng giàu vitamin C, A và chất chống oxy hóa, giúp làm đẹp da và tăng cường miễn dịch. Đu đủ còn giúp bảo vệ mắt và giảm viêm."
+  },
+  {
+    "name": "Potato",
+    "title": "Khoai tây",
+    "subtitle": "Khoai tây chứa nhiều carbohydrate, kali và vitamin B6, cung cấp năng lượng cho cơ thể.",
+    "imageUrl": "assets/images/Potato.png",
+    "detail": "Khoai tây là nguồn carbohydrate quan trọng giúp cung cấp năng lượng. Nó giàu kali, vitamin B6 và chất xơ, hỗ trợ tiêu hóa và điều hòa huyết áp. Khoai tây còn giúp làm đẹp da và giảm viêm hiệu quả."
+  },
+  {
+    "name": "Pumpkin",
+    "title": "Bí ngô",
+    "subtitle": "Bí ngô chứa nhiều beta-carotene, vitamin A và chất chống oxy hóa giúp bảo vệ tim mạch.",
+    "imageUrl": "assets/images/Pumpkin.png",
+    "detail": "Bí ngô là nguồn giàu beta-carotene, giúp bảo vệ mắt và tăng cường miễn dịch. Nó cũng chứa vitamin A, C và chất xơ, hỗ trợ tiêu hóa và tốt cho tim mạch. Bí ngô còn giúp kiểm soát cân nặng và làm đẹp da."
+  }
+]

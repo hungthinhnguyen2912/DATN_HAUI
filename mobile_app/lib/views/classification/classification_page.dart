@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:mobile_app/App_Color.dart';
 import 'package:mobile_app/components/button.dart';
 import 'package:mobile_app/controllers/img_controller.dart';
+import 'package:mobile_app/views/home/detail_vegetable_page.dart';
 import '../../P.dart';
 import '../../models/History.dart';
 
@@ -15,6 +19,21 @@ class ClassificationPage extends StatefulWidget {
 }
 
 class _ClassificationPageState extends State<ClassificationPage> {
+  List<dynamic> vegetables = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadJsonData();
+  }
+
+  Future<void> loadJsonData() async {
+    String jsonString = await rootBundle.loadString('assets/vegetable.json');
+    setState(() {
+      vegetables = json.decode(jsonString);
+    });
+  }
+
   bool _isLoading = false;
 
   @override
@@ -123,10 +142,24 @@ class _ClassificationPageState extends State<ClassificationPage> {
                                 P.auth.currentUser.value?.uid ?? "Unknown User",
                             publicId: P.image.publicId.value,
                           );
+                          String classifiedName = P.classification.result.value;
+                          var vegetable = vegetables.firstWhere(
+                            (veg) => veg["name"] == classifiedName,
+                            orElse: () => null,
+                          );
                           await P.classification.postHistory(his);
                           setState(() {
                             _isLoading = false;
                           });
+                          Get.to(
+                            DetailVegetablePage(
+                              name: vegetable['name'],
+                              title: vegetable['title'],
+                              detail: vegetable['detail'],
+                            ),
+                          );
+                          P.image.clearImage();
+                          P.classification.clearResult();
                         },
                       ),
                       ButtonClassification(
