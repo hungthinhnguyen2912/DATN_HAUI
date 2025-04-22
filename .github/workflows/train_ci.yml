@@ -33,7 +33,7 @@ jobs:
           python test.py
 
       - name: 📤 Upload model
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: mobilenetv2-model
           path: |
