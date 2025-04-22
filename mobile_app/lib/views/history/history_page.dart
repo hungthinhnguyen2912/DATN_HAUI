@@ -75,9 +75,6 @@ class HistoryPage extends StatelessWidget {
                     formattedDate,
                     style: const TextStyle(color: Colors.grey),
                   ),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-                  onTap: () {
-                  },
                 ),
               );
             },

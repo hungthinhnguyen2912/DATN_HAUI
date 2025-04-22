@@ -37,4 +37,7 @@ class HistoryController extends GetxController {
   Future<void> deleteImg(String publicId) async {
     P.cloudinary.destroy(publicId, resourceType: CloudinaryResourceType.image, invalidate: false);
   }
+  Future<void> deleteHistory() async {
+
+  }
 }

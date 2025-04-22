@@ -121,7 +121,6 @@ fine_tune_at = 80
 for layer in base_model.layers[:fine_tune_at]:
     layer.trainable = False
 
-# Dùng lại Adam cho phase 2
 model.compile(
     optimizer=keras.optimizers.Adam(learning_rate=0.001),
     loss='sparse_categorical_crossentropy',
