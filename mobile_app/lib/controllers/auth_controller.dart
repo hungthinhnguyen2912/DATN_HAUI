@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:mobile_app/views/setting/items_setting_page/confirm_page.dart';
 
 import '../models/User.dart';
 import '../views/Widget/bottom_nav_bar.dart';
@@ -153,6 +154,30 @@ class AuthController extends GetxController {
       Get.snackbar("Success", "Vui lòng kiểm tra email của bạn.");
     } on FirebaseAuthException catch (e) {
       print(e.message);
+      Get.snackbar("Error", "Có lỗi xảy ra: ${e.message}");
+    }
+  }
+
+  Future<void> authenticationPassword(
+    String email,
+    String currentPass,
+  ) async {
+    try {
+      AuthCredential authCredential = EmailAuthProvider.credential(
+        email: email,
+        password: currentPass,
+      );
+      await firebaseUser.value?.reauthenticateWithCredential(authCredential);
+      Get.to(ConfirmPage());
+    } on FirebaseAuthException catch (e) {
+      Get.snackbar("Error", "Có lỗi xảy ra: ${e.message}");
+    }
+  }
+  Future<void> updatePassword(String newPass) async {
+    try {
+      await firebaseUser.value?.updatePassword(newPass);
+      Get.snackbar("Success", "Cập nhật mật khẩu thành công.");
+    } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", "Có lỗi xảy ra: ${e.message}");
     }
   }

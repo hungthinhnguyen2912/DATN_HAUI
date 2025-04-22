@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobile_app/views/setting/items_setting_page/change_pass.dart';
 import '../../App_Color.dart';
 import '../../P.dart';
 import 'items_setting_page/edit_profile_page.dart';
@@ -210,7 +211,9 @@ class _SettingPageState extends State<SettingPage> {
           "Edit Profile",
           () => Get.to(() => EditProfilePage()),
         ),
-        _buildSettingItem(Icons.key, "Change Password", () {}),
+        _buildSettingItem(Icons.key, "Change Password", () {
+          Get.to(ChangePassPage());
+        }),
       ],
     );
   }
@@ -249,6 +252,5 @@ class _SettingPageState extends State<SettingPage> {
         ],
       ),
     );
-
   }
 }
