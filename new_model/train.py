@@ -4,10 +4,7 @@ import keras
 from keras import callbacks
 import math
 import time
-import tensorflow_addons as tfa
-# from keras.callbacks import ReduceLROnPlateau
-
-# Enable mixed precision
+import gdown
 policy = keras.mixed_precision.Policy('mixed_float16')
 keras.mixed_precision.set_global_policy(policy)
 
@@ -44,7 +41,6 @@ dataset = raw_dataset.map(parse_and_preprocess, num_parallel_calls=tf.data.AUTOT
 
 # Shuffle và chia dataset
 shuffled_dataset = dataset.shuffle(buffer_size=10000, reshuffle_each_iteration=False)
-
 train_size = int(0.8 * count)
 val_size = count - train_size
 train_dataset = shuffled_dataset.take(train_size)
@@ -75,7 +71,7 @@ model = keras.Sequential([
     keras.layers.GlobalAveragePooling2D(),
     keras.layers.Dense(1024, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)),
     keras.layers.Dropout(0.5),
-    keras.layers.Dense(NUM_CLASSES, activation='softmax', dtype='float32')  # Đảm bảo đầu ra là float32
+    keras.layers.Dense(NUM_CLASSES, activation='softmax', dtype='float32')
 ])
 
 # Compile mô hình
@@ -85,7 +81,7 @@ model.compile(
     metrics=['accuracy']
 )
 
-# callback api
+# Callbacks
 callbacks = [
     keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True),
     keras.callbacks.ModelCheckpoint('best_model_phase1.keras', monitor='val_loss', save_best_only=True),
@@ -106,11 +102,6 @@ history_phase1 = model.fit(
     callbacks=callbacks
 )
 
-
-optimizer = tfa.optimizers.MovingAverage(
-    keras.optimizers.Adam(learning_rate=0.001), average_decay=0.999
-)
-
 print('Phase 2: Start fine-tune model')
 
 # Phase 2: Fine-tune từ layer 80
@@ -119,8 +110,9 @@ fine_tune_at = 80
 for layer in base_model.layers[:fine_tune_at]:
     layer.trainable = False
 
+# Dùng lại Adam cho phase 2
 model.compile(
-    optimizer=optimizer,
+    optimizer=keras.optimizers.Adam(learning_rate=0.001),
     loss='sparse_categorical_crossentropy',
     metrics=['accuracy']
 )
@@ -134,8 +126,6 @@ history_phase2 = model.fit(
     validation_steps=validation_steps,
     callbacks=callbacks
 )
-
-optimizer.assign_average_vars(model.variables)
 
 # Gộp history 2 phase
 history = {
