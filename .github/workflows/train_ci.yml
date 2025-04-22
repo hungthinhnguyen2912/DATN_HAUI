@@ -1,7 +1,14 @@
 name: Train TensorFlow Model
 
 on:
-  workflow_dispatch:  # Cho phép chạy thủ công từ GitHub UI
+  push:
+    branches: [main]
+    paths:
+      - 'new_model/**'
+  pull_request:
+    branches: [main]
+    paths: 
+      - 'new_model/**'
 
 jobs:
   train-model:
