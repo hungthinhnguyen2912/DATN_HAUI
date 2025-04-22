@@ -3,12 +3,8 @@ name: Train TensorFlow Model
 on:
   push:
     branches: [main]
-    paths:
-      - 'new_model/**'
   pull_request:
     branches: [main]
-    paths: 
-      - 'new_model/**'
 
 jobs:
   train-model:
