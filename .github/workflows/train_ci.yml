@@ -10,6 +10,10 @@ jobs:
   train-model:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: new_model
+
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
