@@ -5,6 +5,7 @@ from keras import callbacks
 import math
 import time
 import gdown
+import os
 
 policy = keras.mixed_precision.Policy('mixed_float16')
 keras.mixed_precision.set_global_policy(policy)
