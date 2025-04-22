@@ -4,10 +4,8 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'mobile_app/**'
-  pull_request:
+       pull_request:
     branches: [ main ]
-      - 'mobile_app/**'
 
 jobs:
   build:

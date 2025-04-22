@@ -49,7 +49,7 @@ class _ClassificationPageState extends State<ClassificationPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        centerTitle: false,
+        centerTitle: true,
         backgroundColor: AppColors.green,
         elevation: 4,
         shadowColor: Colors.black54,

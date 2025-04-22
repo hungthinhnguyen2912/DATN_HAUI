@@ -19,7 +19,7 @@ class DetailVegetablePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.green,
-        title: Text(name),
+        title: Text(name,style: TextStyle(color: AppColors.white,fontWeight: FontWeight.bold),),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
