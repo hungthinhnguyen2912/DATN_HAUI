@@ -228,8 +228,6 @@ class ClassificationController extends GetxController {
       result.value = "Error loading image";
       return;
     }
-
-    // Resize về đúng kích thước 299x299
     image = img.copyResize(image, width: 299, height: 299);
 
     // Tạo input tensor với shape [1, 299, 299, 3]

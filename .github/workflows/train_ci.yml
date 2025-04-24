@@ -30,7 +30,7 @@ jobs:
 
       - name: 🧠 Train Model
         run: |
-          python test.py
+          python train.py
 
       - name: 📤 Upload model
         uses: actions/upload-artifact@v4

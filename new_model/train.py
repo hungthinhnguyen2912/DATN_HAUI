@@ -4,9 +4,6 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import keras
-from keras import callbacks
-import math
-import time
 
 from sklearn.metrics import precision_score, recall_score, f1_score
 from sklearn.utils import class_weight
