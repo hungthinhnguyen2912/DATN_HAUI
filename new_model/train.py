@@ -1,27 +1,22 @@
+import os
+
+import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import keras
 from keras import callbacks
 import math
 import time
-import gdown
-policy = keras.mixed_precision.Policy('mixed_float16')
-keras.mixed_precision.set_global_policy(policy)
+
+from sklearn.metrics import precision_score, recall_score, f1_score
+from sklearn.utils import class_weight
 
 TFRECORD_FILE = "tfrecodrd_file/train_data.tfrecord"
-
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+count = 170 * 300
+IMG_SIZE = (224, 224)
+BATCH_SIZE = 32
 # Đếm số mẫu
-count = sum(1 for _ in tf.data.TFRecordDataset(TFRECORD_FILE))
-print(f"📊 TFRecord chứa {count} mẫu.")
-
-# Real-time augmentation
-def augment_image(image, label):
-    image = tf.image.random_flip_left_right(image)
-    image = tf.image.random_brightness(image, max_delta=0.1)
-    image = tf.image.random_contrast(image, lower=0.9, upper=1.1)
-    image = tf.image.random_hue(image, max_delta=0.05)
-    return image, label
-
 # Parse và preprocess
 def parse_and_preprocess(example):
     feature_description = {
@@ -30,32 +25,32 @@ def parse_and_preprocess(example):
     }
     example = tf.io.parse_single_example(example, feature_description)
     image = tf.io.decode_jpeg(example['image'], channels=3)
+    image = tf.image.resize(image, (224, 224))
     image = tf.image.convert_image_dtype(image, tf.float32)
     image = keras.applications.mobilenet_v2.preprocess_input(image * 255.0)
     label = example['label']
     return image, label
 
-# Tạo dataset
 raw_dataset = tf.data.TFRecordDataset(TFRECORD_FILE)
 dataset = raw_dataset.map(parse_and_preprocess, num_parallel_calls=tf.data.AUTOTUNE)
 
-# Shuffle và chia dataset
-shuffled_dataset = dataset.shuffle(buffer_size=10000, reshuffle_each_iteration=False)
+labels = [label.numpy() for _, label in dataset]
+num_classes = len(np.unique(labels))
+print(f"Số lớp: {num_classes}")
+
+class_weights = class_weight.compute_class_weight('balanced', classes=np.unique(labels), y=labels)
+class_weights = dict(enumerate(class_weights))
+
+shuffled_dataset = dataset.shuffle(buffer_size=2000, reshuffle_each_iteration=False)
 train_size = int(0.8 * count)
 val_size = count - train_size
 train_dataset = shuffled_dataset.take(train_size)
 val_dataset = shuffled_dataset.skip(train_size)
 
-# Batch size tăng lên 64
-BATCH_SIZE = 64
-steps_per_epoch = math.ceil(train_size / BATCH_SIZE)
-validation_steps = math.ceil(val_size / BATCH_SIZE)
-
-# Thêm real-time augmentation cho tập train
-train_dataset = train_dataset.map(augment_image, num_parallel_calls=tf.data.AUTOTUNE)
-train_dataset = train_dataset.cache().shuffle(buffer_size=10000, reshuffle_each_iteration=True)
-train_dataset = train_dataset.batch(BATCH_SIZE).repeat().prefetch(tf.data.AUTOTUNE)
+train_dataset = train_dataset.shuffle(buffer_size=2000, reshuffle_each_iteration=True)
+train_dataset = train_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
 val_dataset = val_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
+
 
 # Load MobileNetV2
 base_model = keras.applications.MobileNetV2(
@@ -65,69 +60,117 @@ base_model = keras.applications.MobileNetV2(
 )
 base_model.trainable = False
 NUM_CLASSES = 170
-
 model = keras.Sequential([
+    keras.layers.Input(shape=(224, 224, 3)),
     base_model,
     keras.layers.GlobalAveragePooling2D(),
     keras.layers.Dense(1024, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)),
-    keras.layers.Dropout(0.5),
+    keras.layers.Dropout(0.2),
+    keras.layers.Dense(512, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)),
+    keras.layers.Dropout(0.2),
+    keras.layers.Dense(256, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)),
+    keras.layers.Dropout(0.2),
+    keras.layers.Dense(128, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)),
+    keras.layers.Dropout(0.2),
+    keras.layers.Dense(64, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)),
+    keras.layers.Dropout(0.2),
     keras.layers.Dense(NUM_CLASSES, activation='softmax', dtype='float32')
 ])
 
-# Compile mô hình
+INIT_LR = 0.001
+EPOCHS = 100
+
+lr_schedule = keras.optimizers.schedules.ExponentialDecay(
+    initial_learning_rate=INIT_LR,
+    decay_steps=EPOCHS,
+    decay_rate=INIT_LR / EPOCHS,
+    staircase=True
+)
+
 model.compile(
-    optimizer=keras.optimizers.Adam(learning_rate=0.001),
+    optimizer=keras.optimizers.Adam(learning_rate=lr_schedule),
     loss='sparse_categorical_crossentropy',
     metrics=['accuracy']
 )
 
-# Callbacks
 callbacks = [
-    keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True),
-    keras.callbacks.ModelCheckpoint('best_model_phase1.keras', monitor='val_loss', save_best_only=True),
-    keras.callbacks.TensorBoard(log_dir="logs", histogram_freq=1),
-    callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=2, min_lr=1e-6)
+    keras.callbacks.ModelCheckpoint(
+        'best_model.keras',
+        monitor='val_loss',
+        mode='min',
+        save_best_only=True,
+        verbose=1
+    ),
+    keras.callbacks.EarlyStopping(
+        monitor='val_loss',
+        patience=10,
+        restore_best_weights=True
+    ),
 ]
 
-total_start_time = time.time()
+# Tính steps_per_epoch
+steps_per_epoch = (train_size + BATCH_SIZE - 1) // BATCH_SIZE
+validation_steps = (val_size + BATCH_SIZE - 1) // BATCH_SIZE
 
 # Phase 1: Freeze base model
-EPOCHS_PHASE1 = 10
+EPOCHS_PHASE1 = 50
 history_phase1 = model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=EPOCHS_PHASE1,
     steps_per_epoch=steps_per_epoch,
     validation_steps=validation_steps,
-    callbacks=callbacks
+    callbacks=callbacks,
+    class_weight=class_weights
 )
-
 print('Phase 2: Start fine-tune model')
 
 # Phase 2: Fine-tune từ layer 80
+print('Phase 2: Start fine-tune model')
+# Phase 2: Fine-tune từ layer 100
 base_model.trainable = True
-fine_tune_at = 80
+fine_tune_at = 100
 for layer in base_model.layers[:fine_tune_at]:
     layer.trainable = False
 
-# Dùng lại Adam cho phase 2
 model.compile(
-    optimizer=keras.optimizers.Adam(learning_rate=0.001),
+    optimizer=keras.optimizers.Adam(learning_rate=1e-5),
     loss='sparse_categorical_crossentropy',
     metrics=['accuracy']
 )
 
-EPOCHS_PHASE2 = 10
+
+EPOCHS_PHASE2 = 50
 history_phase2 = model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=EPOCHS_PHASE2,
     steps_per_epoch=steps_per_epoch,
     validation_steps=validation_steps,
-    callbacks=callbacks
+    callbacks=callbacks,
 )
 
-# Gộp history 2 phase
+# Đánh giá trên tập validation
+val_loss, val_accuracy = model.evaluate(val_dataset, steps=validation_steps)
+print(f"Validation Loss: {val_loss:.4f}")
+print(f"Validation Accuracy: {val_accuracy:.4f}")
+
+# Đánh giá chi tiết: precision, recall, F1-score
+y_true = []
+y_pred = []
+for images, labels in val_dataset:
+    predictions = model.predict(images)
+    y_true.extend(labels.numpy())
+    y_pred.extend(np.argmax(predictions, axis=1))
+
+precision = precision_score(y_true, y_pred, average='weighted')
+recall = recall_score(y_true, y_pred, average='weighted')
+f1 = f1_score(y_true, y_pred, average='weighted')
+print(f"Validation Precision: {precision:.4f}")
+print(f"Validation Recall: {recall:.4f}")
+print(f"Validation F1-score: {f1:.4f}")
+
+# Vẽ đồ thị
 history = {
     'loss': history_phase1.history['loss'] + history_phase2.history['loss'],
     'val_loss': history_phase1.history['val_loss'] + history_phase2.history['val_loss'],
@@ -135,12 +178,6 @@ history = {
     'val_accuracy': history_phase1.history['val_accuracy'] + history_phase2.history['val_accuracy'],
 }
 
-# save model
-model.save('mobilenetv2_finetuned_final.keras')
-total_end_time = time.time()
-print(f"Tổng thời gian huấn luyện: {(total_end_time - total_start_time) / 60:.2f} phút")
-
-# Vẽ biểu đồ
 plt.figure(figsize=(12, 4))
 plt.subplot(1, 2, 1)
 plt.plot(history['loss'], label='Train Loss')
@@ -157,13 +194,7 @@ plt.title('Accuracy')
 plt.xlabel('Epoch')
 plt.ylabel('Accuracy')
 plt.legend()
+plt.show()
 
-plt.tight_layout()
-plt.savefig("training_results.png")
-plt.close()
-
-# Đánh giá
-val_loss, val_accuracy = model.evaluate(val_dataset, steps=validation_steps)
-print(f"Validation Loss: {val_loss:.4f}")
-print(f"Validation Accuracy: {val_accuracy:.4f}")
-print(f"Thời gian xử lý: {time.process_time()} giây")
+# Lưu mô hình
+model.save('tl_mobilenetv2_fruit_classifier.keras')

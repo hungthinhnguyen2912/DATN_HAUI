@@ -19,7 +19,6 @@ def parse_example(example):
     example = tf.io.parse_single_example(example, feature_description)
     image = tf.io.decode_jpeg(example['image'], channels=3)
     image = tf.image.convert_image_dtype(image, tf.float32)
-    # image = tf.reverse(image, axis=[-1])  # Chuyển từ BGR sang RGB
     label = example['label']
     return image, label
 
