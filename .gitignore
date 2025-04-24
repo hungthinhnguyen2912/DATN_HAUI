@@ -1,5 +1,5 @@
 mobilenetv2/dataset 
-train_model/dataset 
+train_model/dataset
 *.tfrecord
 *.tflite
 dataset
