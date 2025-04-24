@@ -1,3 +1,4 @@
+import datetime
 import os
 
 import numpy as np
@@ -89,7 +90,7 @@ model.compile(
     loss='sparse_categorical_crossentropy',
     metrics=['accuracy']
 )
-
+log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 callbacks = [
     keras.callbacks.ModelCheckpoint(
         'best_model.keras',
@@ -103,6 +104,13 @@ callbacks = [
         patience=10,
         restore_best_weights=True
     ),
+    keras.callbacks.TensorBoard(
+        log_dir=log_dir,
+        histogram_freq=1,
+        write_graph=True,
+        write_images=True
+    )
+
 ]
 
 # Tính steps_per_epoch
