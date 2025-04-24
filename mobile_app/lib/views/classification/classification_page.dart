@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:mobile_app/App_Color.dart';
 import 'package:mobile_app/components/button.dart';
-import 'package:mobile_app/controllers/img_controller.dart';
 import 'package:mobile_app/views/home/detail_vegetable_page.dart';
 import '../../P.dart';
 import '../../models/History.dart';

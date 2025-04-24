@@ -21,7 +21,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(scaffoldBackgroundColor: AppColors.white),
+      theme: ThemeData(
+        scaffoldBackgroundColor: AppColors.white,
+        primaryColor: AppColors.green,
+        secondaryHeaderColor: AppColors.green,
+      ),
       home: SplashScreen(),
     );
   }
