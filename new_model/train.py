@@ -129,8 +129,8 @@ history_phase1 = model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=EPOCHS_PHASE1,
-    steps_per_epoch=steps_per_epoch,
-    validation_steps=validation_steps,
+    # steps_per_epoch=steps_per_epoch,
+    # validation_steps=validation_steps,
     callbacks=callbacks,
     class_weight=class_weights
 )
@@ -152,8 +152,8 @@ history_phase2 = model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=EPOCHS_PHASE2,
-    steps_per_epoch=steps_per_epoch,
-    validation_steps=validation_steps,
+    # steps_per_epoch=steps_per_epoch,
+    # validation_steps=validation_steps,
     callbacks=callbacks,
 )
 
