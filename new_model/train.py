@@ -14,6 +14,7 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 count = 170 * 300
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
+
 # Đếm số mẫu
 # Parse và preprocess
 def parse_and_preprocess(example):
@@ -28,6 +29,7 @@ def parse_and_preprocess(example):
     image = keras.applications.mobilenet_v2.preprocess_input(image * 255.0)
     label = example['label']
     return image, label
+
 
 raw_dataset = tf.data.TFRecordDataset(TFRECORD_FILE)
 dataset = raw_dataset.map(parse_and_preprocess, num_parallel_calls=tf.data.AUTOTUNE)
@@ -48,7 +50,6 @@ val_dataset = shuffled_dataset.skip(train_size)
 train_dataset = train_dataset.shuffle(buffer_size=2000, reshuffle_each_iteration=True)
 train_dataset = train_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
 val_dataset = val_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
-
 
 # Load MobileNetV2
 base_model = keras.applications.MobileNetV2(
@@ -109,10 +110,15 @@ callbacks = [
         histogram_freq=1,
         write_graph=True,
         write_images=True
+    ),
+    keras.callbacks.ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.5,
+        patience=5,
+        min_lr=1e-7,
+        verbose=1
     )
-
 ]
-
 # Tính steps_per_epoch
 steps_per_epoch = (train_size + BATCH_SIZE - 1) // BATCH_SIZE
 validation_steps = (val_size + BATCH_SIZE - 1) // BATCH_SIZE
@@ -129,9 +135,6 @@ history_phase1 = model.fit(
     class_weight=class_weights
 )
 print('Phase 2: Start fine-tune model')
-
-# Phase 2: Fine-tune từ layer 80
-print('Phase 2: Start fine-tune model')
 # Phase 2: Fine-tune từ layer 100
 base_model.trainable = True
 fine_tune_at = 100
@@ -143,7 +146,6 @@ model.compile(
     loss='sparse_categorical_crossentropy',
     metrics=['accuracy']
 )
-
 
 EPOCHS_PHASE2 = 50
 history_phase2 = model.fit(

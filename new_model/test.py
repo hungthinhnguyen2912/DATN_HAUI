@@ -142,11 +142,8 @@ history_phase1 = model.fit(
     callbacks=callbacks,
     class_weight=class_weights
 )
-print('Phase 2: Start fine-tune model')
-
-# Phase 2: Fine-tune từ layer 80
-print('Phase 2: Start fine-tune model')
 # Phase 2: Fine-tune từ layer 100
+print('Phase 2: Start fine-tune model')
 base_model.trainable = True
 fine_tune_at = 100
 for layer in base_model.layers[:fine_tune_at]:
