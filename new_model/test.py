@@ -43,6 +43,7 @@ def parse_and_preprocess(example):
     label = example['label']
     return image, label
 
+
 raw_dataset = tf.data.TFRecordDataset(TFRECORD_FILE)
 dataset = raw_dataset.map(parse_and_preprocess, num_parallel_calls=tf.data.AUTOTUNE)
 
@@ -63,32 +64,21 @@ train_dataset = train_dataset.shuffle(buffer_size=2000, reshuffle_each_iteration
 train_dataset = train_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
 val_dataset = val_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
 
-
 # Load MobileNetV2
 base_model = keras.applications.MobileNetV2(
     input_shape=(224, 224, 3),
     include_top=False,
     weights='imagenet'
 )
-base_model.trainable = False
 NUM_CLASSES = 170
 model = keras.Sequential([
     keras.layers.Input(shape=(224, 224, 3)),
     base_model,
     keras.layers.GlobalAveragePooling2D(),
-    keras.layers.Dense(1024, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)),
-    keras.layers.Dropout(0.2),
-    keras.layers.Dense(512, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)),
-    keras.layers.Dropout(0.2),
-    keras.layers.Dense(256, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)),
-    keras.layers.Dropout(0.2),
-    keras.layers.Dense(128, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)),
-    keras.layers.Dropout(0.2),
-    keras.layers.Dense(64, activation='relu', kernel_regularizer=keras.regularizers.l2(0.01)),
-    keras.layers.Dropout(0.2),
+    keras.layers.Dense(512, activation='relu'),
+    keras.layers.Dropout(0.3),
     keras.layers.Dense(NUM_CLASSES, activation='softmax', dtype='float32')
 ])
-
 INIT_LR = 0.001
 EPOCHS = 100
 
@@ -97,12 +87,6 @@ lr_schedule = keras.optimizers.schedules.ExponentialDecay(
     decay_steps=EPOCHS,
     decay_rate=INIT_LR / EPOCHS,
     staircase=True
-)
-
-model.compile(
-    optimizer=keras.optimizers.Adam(learning_rate=lr_schedule),
-    loss='sparse_categorical_crossentropy',
-    metrics=['accuracy']
 )
 log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 callbacks = [
@@ -123,46 +107,38 @@ callbacks = [
         histogram_freq=1,
         write_graph=True,
         write_images=True
+    ),
+    keras.callbacks.ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.5,
+        patience=5,
+        min_lr=1e-7,
+        verbose=1
     )
-
 ]
-
 # Tính steps_per_epoch
 steps_per_epoch = (train_size + BATCH_SIZE - 1) // BATCH_SIZE
 validation_steps = (val_size + BATCH_SIZE - 1) // BATCH_SIZE
-
-# Phase 1: Freeze base model
-EPOCHS_PHASE1 = 50
-history_phase1 = model.fit(
-    train_dataset,
-    validation_data=val_dataset,
-    epochs=EPOCHS_PHASE1,
-    steps_per_epoch=steps_per_epoch,
-    validation_steps=validation_steps,
-    callbacks=callbacks,
-    class_weight=class_weights
-)
-# Phase 2: Fine-tune từ layer 100
-print('Phase 2: Start fine-tune model')
 base_model.trainable = True
-fine_tune_at = 100
+
+
+fine_tune_at = 50
 for layer in base_model.layers[:fine_tune_at]:
     layer.trainable = False
 
 model.compile(
-    optimizer=keras.optimizers.Adam(learning_rate=1e-5),
+    optimizer=keras.optimizers.Adam(learning_rate=1e-4),
     loss='sparse_categorical_crossentropy',
     metrics=['accuracy']
 )
 
-
 EPOCHS_PHASE2 = 50
-history_phase2 = model.fit(
+history = model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=EPOCHS_PHASE2,
-    steps_per_epoch=steps_per_epoch,
-    validation_steps=validation_steps,
+    # steps_per_epoch=steps_per_epoch,
+    # validation_steps=validation_steps,
     callbacks=callbacks,
 )
 
@@ -187,30 +163,25 @@ print(f"Validation Recall: {recall:.4f}")
 print(f"Validation F1-score: {f1:.4f}")
 
 # Vẽ đồ thị
-history = {
-    'loss': history_phase1.history['loss'] + history_phase2.history['loss'],
-    'val_loss': history_phase1.history['val_loss'] + history_phase2.history['val_loss'],
-    'accuracy': history_phase1.history['accuracy'] + history_phase2.history['accuracy'],
-    'val_accuracy': history_phase1.history['val_accuracy'] + history_phase2.history['val_accuracy'],
-}
-
 plt.figure(figsize=(12, 4))
 plt.subplot(1, 2, 1)
-plt.plot(history['loss'], label='Train Loss')
-plt.plot(history['val_loss'], label='Val Loss')
+plt.plot(history.history['loss'], label='Train Loss')
+plt.plot(history.history['val_loss'], label='Val Loss')
 plt.title('Loss')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.legend()
 
 plt.subplot(1, 2, 2)
-plt.plot(history['accuracy'], label='Train Accuracy')
-plt.plot(history['val_accuracy'], label='Val Accuracy')
+plt.plot(history.history['accuracy'], label='Train Accuracy')
+plt.plot(history.history['val_accuracy'], label='Val Accuracy')
 plt.title('Accuracy')
 plt.xlabel('Epoch')
 plt.ylabel('Accuracy')
 plt.legend()
+
 plt.show()
+
 
 # Lưu mô hình
 model.save('tl_mobilenetv2_fruit_classifier.keras')
