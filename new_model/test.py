@@ -133,15 +133,13 @@ model.compile(
     metrics=['accuracy']
 )
 
-EPOCHS_PHASE2 = 50
+EPOCHS_PHASE2 = 100
 history = model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=EPOCHS_PHASE2,
-    # steps_per_epoch=steps_per_epoch,
-    # validation_steps=validation_steps,
-    steps_per_epoch=train_size,
-    validation_steps=val_size,
+    steps_per_epoch=train_size / EPOCHS,
+    validation_steps=val_size / EPOCHS,
     callbacks=callbacks,
 )
 
