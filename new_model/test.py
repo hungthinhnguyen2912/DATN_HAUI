@@ -28,6 +28,8 @@ os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 count = 170 * 300
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
+
+
 # Đếm số mẫu
 # Parse và preprocess
 def parse_and_preprocess(example):
@@ -121,7 +123,6 @@ steps_per_epoch = (train_size + BATCH_SIZE - 1) // BATCH_SIZE
 validation_steps = (val_size + BATCH_SIZE - 1) // BATCH_SIZE
 base_model.trainable = True
 
-
 fine_tune_at = 50
 for layer in base_model.layers[:fine_tune_at]:
     layer.trainable = False
@@ -139,6 +140,8 @@ history = model.fit(
     epochs=EPOCHS_PHASE2,
     # steps_per_epoch=steps_per_epoch,
     # validation_steps=validation_steps,
+    steps_per_epoch=train_size,
+    validation_steps=val_size,
     callbacks=callbacks,
 )
 
@@ -181,7 +184,6 @@ plt.ylabel('Accuracy')
 plt.legend()
 
 plt.show()
-
 
 # Lưu mô hình
 model.save('tl_mobilenetv2_fruit_classifier.keras')
