@@ -1,4 +1,5 @@
 import datetime
+import math
 
 import numpy as np
 import tensorflow as tf
@@ -138,8 +139,8 @@ history = model.fit(
     train_dataset,
     validation_data=val_dataset,
     epochs=EPOCHS_PHASE2,
-    steps_per_epoch=train_size / EPOCHS,
-    validation_steps=val_size / EPOCHS,
+    steps_per_epoch=math.ceil(train_size / EPOCHS_PHASE2),
+    validation_steps=math.ceil(val_size / EPOCHS_PHASE2),
     callbacks=callbacks,
 )
 
