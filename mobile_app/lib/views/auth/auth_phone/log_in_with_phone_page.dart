@@ -34,7 +34,7 @@ class LogInWithPhonePage extends StatelessWidget {
                   child: Center(
                     child: IconButton(
                       onPressed: () {
-                        Get.off(() => AuthScreen());
+                        Get.offAll(() => AuthScreen());
                       },
                       icon: Icon(Icons.arrow_back_ios),
                     ),

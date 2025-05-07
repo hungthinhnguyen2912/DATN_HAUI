@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:mobile_app/views/setting/items_setting_page/change_pass.dart';
 import '../../App_Color.dart';
 import '../../P.dart';
-import 'items_setting_page/edit_profile_page.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -209,13 +208,21 @@ class _SettingPageState extends State<SettingPage> {
         _buildSettingItem(
           Icons.person,
           "Edit Profile",
-          () => Get.to(() => EditProfilePage()),
+          () => Get.toNamed("/edit_profile_page"),
         ),
-        _buildSettingItem(Icons.key, "Change Password", () {
-          Get.to(ChangePassPage());
-        }),
+        _buildItemChangePass(),
       ],
     );
+  }
+
+  Widget _buildItemChangePass() {
+    if (P.auth.isGoogleUser.value == true) {
+      return SizedBox();
+    } else {
+      return _buildSettingItem(Icons.key, "Change Password", () {
+        Get.to(ChangePassPage());
+      });
+    }
   }
 
   Widget _buildAppSettings() {
@@ -243,7 +250,7 @@ class _SettingPageState extends State<SettingPage> {
               Get.snackbar(
                 "Success",
                 "History cleared!",
-                snackPosition: SnackPosition.BOTTOM,
+                snackPosition: SnackPosition.TOP,
               );
             },
             child: const Text("Yes"),

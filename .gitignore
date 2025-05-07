@@ -2,4 +2,5 @@ mobilenetv2/dataset
 train_model/dataset
 *.tfrecord
 *.tflite
+*.keras
 dataset

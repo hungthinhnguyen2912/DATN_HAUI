@@ -5,11 +5,12 @@ class UserModel {
   final String email;
   final Timestamp createdAt;
   final String uid;
+  final String phone;
   String avatarUrl;
   String publicIdAvatar;
 
 
-  UserModel({
+  UserModel({required this.phone,
     required this.uid,
     required this.name,
     required this.email,
@@ -20,6 +21,7 @@ class UserModel {
   Map<String, dynamic> toJson() =>
       {
         "name": name,
+        "phone": phone,
         "email": email,
         "createdAt": createdAt,
         "uid": uid,

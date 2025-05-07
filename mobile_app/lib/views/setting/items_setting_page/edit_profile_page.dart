@@ -8,6 +8,7 @@ class EditProfilePage extends StatelessWidget {
   EditProfilePage({super.key});
 
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -30,16 +31,7 @@ class EditProfilePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Your Account Information',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
             const SizedBox(height: 20),
-
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -51,9 +43,9 @@ class EditProfilePage extends StatelessWidget {
                   controller: _emailController,
                   textWarning: "",
                   hintText:
-                      P.auth.currentUser.value!.email ?? 'Email not available',
+                      P.auth.currentUser.value!.email,
                   obs: false,
-                  readOnly: true,
+                  readOnly: false,
                   // prefixIcon: const Icon(Icons.email, color: Colors.blueAccent),
                 ),
               ),
@@ -66,12 +58,12 @@ class EditProfilePage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: InputTextField(
-                  controller: _emailController,
+                  controller: _userNameController,
                   textWarning: "",
                   hintText:
                       P.auth.currentUser.value!.name ?? 'Email not available',
                   obs: false,
-                  readOnly: true,
+                  readOnly: false,
                   // prefixIcon: const Icon(Icons.email, color: Colors.blueAccent),
                 ),
               ),
@@ -81,9 +73,13 @@ class EditProfilePage extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   Get.snackbar('Success', 'Profile updated successfully!');
+                  P.auth.editProfile(
+                    _emailController.text,
+                    _userNameController.text,
+                  );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
+                  backgroundColor: AppColors.green,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 40,

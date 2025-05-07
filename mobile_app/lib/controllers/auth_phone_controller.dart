@@ -1,8 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:mobile_app/P.dart';
+import 'package:mobile_app/views/auth/auth_phone/verify_code.dart';
 
 class AuthPhoneController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  RxString verificationID = "".obs;
+
   String formatPhoneNumber(String phoneNumber) {
     if (phoneNumber.startsWith("0")) {
       return "+84${phoneNumber.substring(1)}";
@@ -21,16 +26,46 @@ class AuthPhoneController extends GetxController {
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           print("Timeout: $verificationId");
+          verificationID.value = verificationId;
         },
         timeout: const Duration(seconds: 60),
         verificationFailed: (FirebaseAuthException error) {
           print(error.toString());
         },
       );
+      Get.to(() => VerifyCode());
     } on FirebaseAuthException catch (e) {
       print("Firebase auth exception");
       print(e.message);
       Get.snackbar("Error", "Có lỗi xảy ra: ${e.message}");
+    }
+  }
+
+  Future<void> verifyOTP(String smsCode) async {
+    try {
+      final credential = PhoneAuthProvider.credential(
+        verificationId: verificationID.value,
+        smsCode: smsCode,
+      );
+      FirebaseFirestore.instance
+          .collection("User")
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .set({
+            "phone": formatPhoneNumber(
+              FirebaseAuth.instance.currentUser!.phoneNumber!,
+            ),
+            "uid": FirebaseAuth.instance.currentUser!.uid,
+            "name": "",
+            "email": "",
+            "createdAt": DateTime.now(),
+            "avatarUrl": "",
+            "publicIdAvatar": "",
+          });
+      await _auth.signInWithCredential(credential);
+      print("Xác thực thành công!");
+      Get.offNamed("/home");
+    } catch (e) {
+      print("Xác thực OTP thất bại: $e");
     }
   }
 }

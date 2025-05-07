@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mobile_app/views/setting/items_setting_page/confirm_page.dart';
@@ -12,6 +13,7 @@ class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  RxBool isGoogleUser = false.obs;
   Rxn<User> firebaseUser = Rxn<User>();
   Rx<UserModel?> currentUser = Rx<UserModel?>(null);
 
@@ -39,7 +41,7 @@ class AuthController extends GetxController {
           "createdAt": DateTime.now(),
           "uid": userCredential.user!.uid,
           "avatarUrl": "",
-          "publicIdAvatar": "",
+          "publicIdAvatar": googleUser.photoUrl,
         });
       }
       DocumentSnapshot userDoc =
@@ -49,6 +51,7 @@ class AuthController extends GetxController {
               .get();
       if (userDoc.exists) {
         currentUser.value = UserModel(
+          phone: userDoc['phone'],
           uid: userDoc['uid'],
           name: userDoc['name'],
           email: userDoc['email'],
@@ -64,6 +67,7 @@ class AuthController extends GetxController {
         );
       }
       Get.off(myBottomNavBar());
+      isGoogleUser.value = true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'account-exists-with-different-credential') {
         Get.snackbar(
@@ -83,6 +87,7 @@ class AuthController extends GetxController {
           await _firestore.collection("User").doc(_auth.currentUser!.uid).get();
       if (userDoc.exists && userDoc.data() != null) {
         currentUser.value = UserModel(
+          phone: userDoc['phone'],
           uid: userDoc['uid'],
           name: userDoc['name'],
           email: userDoc['email'],
@@ -116,6 +121,7 @@ class AuthController extends GetxController {
         uid: userCredential.user!.uid,
         avatarUrl: "",
         publicIdAvatar: "",
+        phone: '',
       );
       currentUser.value = user;
       await _firestore
@@ -143,9 +149,10 @@ class AuthController extends GetxController {
       name: "",
       email: "",
       createdAt: Timestamp(0, 0),
-      avatarUrl: "",
+      avatarUrl: "", phone: '',
     );
     Get.offAll(() => AuthScreen());
+    isGoogleUser.value = false;
   }
 
   Future<void> resetPassword(String email) async {
@@ -158,27 +165,47 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> authenticationPassword(
-    String email,
-    String currentPass,
-  ) async {
+  Future<void> authenticationPassword(String email, String currentPass) async {
+    Get.dialog(
+      Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
     try {
       AuthCredential authCredential = EmailAuthProvider.credential(
         email: email,
         password: currentPass,
       );
+      if (firebaseUser.value == null) {
+        Get.snackbar("Lỗi", "Người dùng chưa đăng nhập");
+        return;
+      }
       await firebaseUser.value?.reauthenticateWithCredential(authCredential);
       Get.to(ConfirmPage());
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", "Có lỗi xảy ra: ${e.message}");
+    } finally {
+      Get.back();
     }
   }
+
   Future<void> updatePassword(String newPass) async {
     try {
       await firebaseUser.value?.updatePassword(newPass);
       Get.snackbar("Success", "Cập nhật mật khẩu thành công.");
     } on FirebaseAuthException catch (e) {
       Get.snackbar("Error", "Có lỗi xảy ra: ${e.message}");
+      Get.off(AuthScreen());
+    }
+  }
+
+  Future<void> editProfile(String email, String name) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection("User")
+          .doc(currentUser.value!.uid)
+          .update({"name": name, "email": email});
+    } catch (e) {
+      print("Edit failed: ${e.toString()}");
     }
   }
 }

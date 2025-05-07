@@ -1,174 +1,156 @@
-import datetime
-import os
-
 import numpy as np
-import tensorflow as tf
+import pandas as pd
 import matplotlib.pyplot as plt
 import keras
+import os
+from keras.src.regularizers import L2
+from keras import Input, Model
+from keras.src.applications.mobilenet_v2 import MobileNetV2
+from keras.src.callbacks import EarlyStopping, ReduceLROnPlateau
+from keras.src.layers import GlobalAveragePooling2D, Dense, BatchNormalization, Dropout
+from keras.src.legacy.preprocessing.image import ImageDataGenerator
+from keras.src.optimizers import Adam
 
-from sklearn.metrics import precision_score, recall_score, f1_score
-from sklearn.utils import class_weight
+dataset = r"D:\\datn_haui\\new_model\\dataset\\Vegetable Images"
 
-TFRECORD_FILE = "tfrecodrd_file/train_data.tfrecord"
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-count = 170 * 300
-IMG_SIZE = (224, 224)
-BATCH_SIZE = 32
+train_dir = os.path.join(dataset, "train")
+test_dir = os.path.join(dataset, "validation")
+val_dir = os.path.join(dataset, "test")
 
-# Đếm số mẫu
-# Parse và preprocess
-def parse_and_preprocess(example):
-    feature_description = {
-        'image': tf.io.FixedLenFeature([], tf.string),
-        'label': tf.io.FixedLenFeature([], tf.int64),
-    }
-    example = tf.io.parse_single_example(example, feature_description)
-    image = tf.io.decode_jpeg(example['image'], channels=3)
-    image = tf.image.resize(image, (224, 224))
-    image = tf.image.convert_image_dtype(image, tf.float32)
-    image = keras.applications.mobilenet_v2.preprocess_input(image * 255.0)
-    label = example['label']
-    return image, label
+image_size = 224
+batch_size = 32
 
-
-raw_dataset = tf.data.TFRecordDataset(TFRECORD_FILE)
-dataset = raw_dataset.map(parse_and_preprocess, num_parallel_calls=tf.data.AUTOTUNE)
-
-labels = [label.numpy() for _, label in dataset]
-num_classes = len(np.unique(labels))
-print(f"Số lớp: {num_classes}")
-
-class_weights = class_weight.compute_class_weight('balanced', classes=np.unique(labels), y=labels)
-class_weights = dict(enumerate(class_weights))
-
-shuffled_dataset = dataset.shuffle(buffer_size=2000, reshuffle_each_iteration=False)
-train_size = int(0.8 * count)
-val_size = count - train_size
-train_dataset = shuffled_dataset.take(train_size)
-val_dataset = shuffled_dataset.skip(train_size)
-
-train_dataset = train_dataset.shuffle(buffer_size=2000, reshuffle_each_iteration=True)
-train_dataset = train_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
-val_dataset = val_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
-
-# Load MobileNetV2
-base_model = keras.applications.MobileNetV2(
-    input_shape=(224, 224, 3),
-    include_top=False,
-    weights='imagenet'
-)
-NUM_CLASSES = 170
-model = keras.Sequential([
-    keras.layers.Input(shape=(224, 224, 3)),
-    base_model,
-    keras.layers.GlobalAveragePooling2D(),
-    keras.layers.Dense(512, activation='relu'),
-    keras.layers.Dropout(0.3),
-    keras.layers.Dense(NUM_CLASSES, activation='softmax', dtype='float32')
-])
-INIT_LR = 0.001
-EPOCHS = 100
-
-lr_schedule = keras.optimizers.schedules.ExponentialDecay(
-    initial_learning_rate=INIT_LR,
-    decay_steps=EPOCHS,
-    decay_rate=INIT_LR / EPOCHS,
-    staircase=True
-)
-log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-callbacks = [
-    keras.callbacks.ModelCheckpoint(
-        'best_model.keras',
-        monitor='val_loss',
-        mode='min',
-        save_best_only=True,
-        verbose=1
-    ),
-    keras.callbacks.EarlyStopping(
-        monitor='val_loss',
-        patience=10,
-        restore_best_weights=True
-    ),
-    keras.callbacks.TensorBoard(
-        log_dir=log_dir,
-        histogram_freq=1,
-        write_graph=True,
-        write_images=True
-    ),
-    keras.callbacks.ReduceLROnPlateau(
-        monitor='val_loss',
-        factor=0.5,
-        patience=5,
-        min_lr=1e-7,
-        verbose=1
-    )
-]
-# Tính steps_per_epoch
-steps_per_epoch = (train_size + BATCH_SIZE - 1) // BATCH_SIZE
-validation_steps = (val_size + BATCH_SIZE - 1) // BATCH_SIZE
-base_model.trainable = True
-
-
-fine_tune_at = 50
-for layer in base_model.layers[:fine_tune_at]:
-    layer.trainable = False
-
-model.compile(
-    optimizer=keras.optimizers.Adam(learning_rate=1e-4),
-    loss='sparse_categorical_crossentropy',
-    metrics=['accuracy']
+train_datagen = ImageDataGenerator(
+    rescale=1. / 255,
+    rotation_range=20,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    shear_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=True,
+    fill_mode='nearest'
 )
 
-EPOCHS_PHASE2 = 50
-history = model.fit(
-    train_dataset,
-    validation_data=val_dataset,
-    epochs=EPOCHS_PHASE2,
-    # steps_per_epoch=steps_per_epoch,
-    # validation_steps=validation_steps,
-    callbacks=callbacks,
+val_test_datagen = ImageDataGenerator(rescale=1. / 255)
+
+train_generator = train_datagen.flow_from_directory(
+    train_dir,
+    target_size=(image_size, image_size),
+    batch_size=batch_size,
+    class_mode='categorical',
+    color_mode='rgb'
 )
 
-# Đánh giá trên tập validation
-val_loss, val_accuracy = model.evaluate(val_dataset, steps=validation_steps)
-print(f"Validation Loss: {val_loss:.4f}")
-print(f"Validation Accuracy: {val_accuracy:.4f}")
+val_generator = val_test_datagen.flow_from_directory(
+    val_dir,
+    target_size=(image_size, image_size),
+    batch_size=batch_size,
+    class_mode='categorical',
+    color_mode='rgb'
+)
 
-# Đánh giá chi tiết: precision, recall, F1-score
-y_true = []
-y_pred = []
-for images, labels in val_dataset:
-    predictions = model.predict(images)
-    y_true.extend(labels.numpy())
-    y_pred.extend(np.argmax(predictions, axis=1))
+test_generator = val_test_datagen.flow_from_directory(
+    test_dir,
+    target_size=(image_size, image_size),
+    batch_size=batch_size,
+    class_mode='categorical',
+    color_mode='rgb',
+    shuffle=False
+)
 
-precision = precision_score(y_true, y_pred, average='weighted')
-recall = recall_score(y_true, y_pred, average='weighted')
-f1 = f1_score(y_true, y_pred, average='weighted')
-print(f"Validation Precision: {precision:.4f}")
-print(f"Validation Recall: {recall:.4f}")
-print(f"Validation F1-score: {f1:.4f}")
+def load_model(n_layers_to_unfreeze=0):
+    inputs = Input(shape=(224, 224, 3))
+    base_model = MobileNetV2(weights='imagenet', include_top=False, input_tensor=inputs)
+    n_layers_to_unfreeze = min(n_layers_to_unfreeze, len(base_model.layers))
+    for layer in base_model.layers:
+        layer.trainable = False
+    if n_layers_to_unfreeze > 0:
+        for layer in base_model.layers[-n_layers_to_unfreeze:]:
+            layer.trainable = True
+    x = base_model.output
+    x = GlobalAveragePooling2D()(x)
 
-# Vẽ đồ thị
-plt.figure(figsize=(12, 4))
-plt.subplot(1, 2, 1)
-plt.plot(history.history['loss'], label='Train Loss')
-plt.plot(history.history['val_loss'], label='Val Loss')
-plt.title('Loss')
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.legend()
+    x = Dense(64, kernel_regularizer=L2(0.0001), activation='relu')(x)
+    x = BatchNormalization()(x)
+    x = Dropout(0.1)(x)
 
-plt.subplot(1, 2, 2)
-plt.plot(history.history['accuracy'], label='Train Accuracy')
-plt.plot(history.history['val_accuracy'], label='Val Accuracy')
-plt.title('Accuracy')
-plt.xlabel('Epoch')
-plt.ylabel('Accuracy')
-plt.legend()
+    target_output = Dense(15, activation='softmax')(x)
+    model = Model(inputs=inputs, outputs=target_output)
 
-plt.show()
+    return model
+early_stopping = EarlyStopping(
+    monitor='val_loss',
+    patience=5,
+    restore_best_weights=True
+)
+reduce_lr = ReduceLROnPlateau(
+    monitor='val_loss',
+    factor=0.2,
+    patience=2,
+    min_lr=1e-6
+)
+def plot_learning_curves(history):
+    plt.figure(figsize=(12, 4))
+
+    # Loss plot
+    plt.subplot(1, 2, 1)
+    plt.plot(history['loss'], label='Training Loss')
+    plt.plot(history['val_loss'], label='Validation Loss')
+    plt.title('Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+
+    # Accuracy plot
+    plt.subplot(1, 2, 2)
+    plt.plot(history['accuracy'], label='Training Accuracy')
+    plt.plot(history['val_accuracy'], label='Validation Accuracy')
+    plt.title('Accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.ylim(0, 1)
+    plt.show()
 
 
-# Lưu mô hình
-model.save('tl_mobilenetv2_fruit_classifier.keras')
+def train_model(model,
+                train_generator,
+                val_generator,
+                epochs,
+                learning_rate,
+                callbacks=None):
+    model.compile(optimizer=Adam(learning_rate=learning_rate),
+                  loss='categorical_crossentropy',
+                  metrics=[
+                      'accuracy',
+                      keras.metrics.Precision(),
+                      keras.metrics.Recall(),
+                      keras.metrics.AUC(name='auroc')
+                  ])
+
+    history = model.fit(train_generator,
+                        epochs=epochs,
+                        validation_data=val_generator,
+                        callbacks=callbacks)
+    history_df = pd.DataFrame(history.history)
+    model.save("model.keras")
+    plot_learning_curves(history_df)
+
+
+model = load_model(2)
+
+train_model(model,
+            train_generator,
+            val_generator,
+            epochs=10,
+            learning_rate=0.001,
+            callbacks=[early_stopping, reduce_lr])
+
+true_classes = test_generator.classes
+predictions = model.predict(test_generator)
+
+predicted_classes = np.argmax(predictions, axis=1)
+
+test_labels = test_generator.class_indices.keys()
+
+model.evaluate(test_generator)
