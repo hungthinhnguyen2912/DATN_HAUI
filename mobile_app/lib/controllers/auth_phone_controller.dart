@@ -22,7 +22,8 @@ class AuthPhoneController extends GetxController {
         phoneNumber: formatPhoneNumber(phoneNumber),
         verificationCompleted: (PhoneAuthCredential credential) {},
         codeSent: (String verificationId, int? resendToken) {
-          print("OTP sent to $phoneNumber");
+          verificationID.value = verificationId;
+            print("OTP sent to $phoneNumber");
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           print("Timeout: $verificationId");
@@ -47,7 +48,8 @@ class AuthPhoneController extends GetxController {
         verificationId: verificationID.value,
         smsCode: smsCode,
       );
-      FirebaseFirestore.instance
+      await _auth.signInWithCredential(credential);
+      await FirebaseFirestore.instance
           .collection("User")
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .set({
@@ -61,7 +63,6 @@ class AuthPhoneController extends GetxController {
             "avatarUrl": "",
             "publicIdAvatar": "",
           });
-      await _auth.signInWithCredential(credential);
       print("Xác thực thành công!");
       Get.offNamed("/home");
     } catch (e) {
