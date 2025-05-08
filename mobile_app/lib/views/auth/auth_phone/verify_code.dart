@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mobile_app/views/auth/auth_phone/log_in_with_phone_page.dart';
 
 import '../../../App_Color.dart';
 import '../../../P.dart';
 import '../../../components/button.dart';
 import '../../../components/input_text_field.dart';
-import '../auth_screen.dart';
-
 
 class VerifyCode extends StatelessWidget {
   VerifyCode({super.key});
@@ -34,7 +33,7 @@ class VerifyCode extends StatelessWidget {
                   child: Center(
                     child: IconButton(
                       onPressed: () {
-                        Get.off(() => AuthScreen());
+                        Get.off(() => LogInWithPhonePage());
                       },
                       icon: Icon(Icons.arrow_back_ios),
                     ),
@@ -61,7 +60,8 @@ class VerifyCode extends StatelessWidget {
             controller: _codeController,
             textWarning: "Enter your phone number",
             hintText: "Enter your phone number",
-            obs: false, readOnly: false,
+            obs: false,
+            readOnly: false,
           ),
           Padding(
             padding: const EdgeInsets.only(left: 20),

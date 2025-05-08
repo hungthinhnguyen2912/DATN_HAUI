@@ -1,20 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:mobile_app/P.dart';
 import 'package:mobile_app/views/auth/auth_phone/verify_code.dart';
+
+import '../string_extension.dart';
 
 class AuthPhoneController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   RxString verificationID = "".obs;
 
-  String formatPhoneNumber(String phoneNumber) {
-    if (phoneNumber.startsWith("0")) {
-      return "+84${phoneNumber.substring(1)}";
-    } else {
-      return phoneNumber;
-    }
-  }
+
 
   Future<void> sendOTP(String phoneNumber) async {
     try {
@@ -57,7 +52,7 @@ class AuthPhoneController extends GetxController {
               FirebaseAuth.instance.currentUser!.phoneNumber!,
             ),
             "uid": FirebaseAuth.instance.currentUser!.uid,
-            "name": "",
+            "name": "user${generateRandomString(10)}",
             "email": "",
             "createdAt": DateTime.now(),
             "avatarUrl": "",
