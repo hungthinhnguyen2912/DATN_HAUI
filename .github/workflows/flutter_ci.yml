@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]  
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
@@ -29,35 +29,47 @@ jobs:
           flutter-version: '3.29.0'
           channel: 'stable'
 
-      # Cài đặt dependencies
       - name: Install dependencies
         run: flutter pub get
 
-      # Chạy tests (nếu bạn có)
       - name: Run tests
         run: flutter test
 
-      # Build APK
       - name: Build APK
         run: flutter build apk --release
 
-      # Upload APK như artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: mobile_app/build/app/outputs/flutter-apk/app-release.apk
+
   run-integration-tests:
+    needs: build
     runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: mobile_app
+
     steps:
-      - name: check out code
+      - name: Checkout code
         uses: actions/checkout@v4
+
       - uses: subosito/flutter-action@v2
-      - name: Pub get package
-        uses: flutter pub get
-      - name: build ios app
+        with:
+          flutter-version: '3.29.0'
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build iOS app
         run: flutter build ios --debug --no-codesign
-      - uses: futureware-tech/simulator-action@v1
-        with: 
-          mode: "iphone 12"
-      - run: flutter test  
+
+      - name: Start iOS simulator
+        uses: futureware-tech/simulator-action@v1
+        with:
+          model: 'iPhone 12'
+
+      - name: Run integration tests
+        run: flutter test integration_test
