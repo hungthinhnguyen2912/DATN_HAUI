@@ -9,7 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: mobile_app
@@ -48,3 +47,17 @@ jobs:
         with:
           name: app-release
           path: mobile_app/build/app/outputs/flutter-apk/app-release.apk
+  run-integration-tests:
+    runs-on: macos-latest
+    steps:
+      - name: check out code
+        uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+      - name: Pub get package
+        uses: flutter pub get
+      - name: build ios app
+        run: flutter build ios --debug --no-codesign
+      - uses: futureware-tech/simulator-action@v1
+        with: 
+          mode: "iphone 12"
+      - run: flutter test  
