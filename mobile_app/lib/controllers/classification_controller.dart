@@ -222,50 +222,6 @@ class ClassificationController extends GetxController {
     print("📌 Input tensor shape: ${_interpreter.getInputTensor(0).shape}");
     print("📌 Output tensor shape: ${_interpreter.getOutputTensor(0).shape}");
   }
-  // Future<void> classifyImage(File imageFile) async {
-  //   img.Image? image = img.decodeImage(imageFile.readAsBytesSync());
-  //   if (image == null) {
-  //     result.value = "Error loading image";
-  //     return;
-  //   }
-  //   image = img.copyResize(image, width: 299, height: 299);
-  //
-  //   // Tạo input tensor với shape [1, 299, 299, 3]
-  //   List input = List.generate(
-  //     1,
-  //         (i) => List.generate(
-  //       299,
-  //           (y) => List.generate(299, (x) => List.filled(3, 0.0)),
-  //     ),
-  //   );
-  //
-  //   // Gán giá trị RGB đã chuẩn hóa vào input
-  //   for (int y = 0; y < 299; y++) {
-  //     for (int x = 0; x < 299; x++) {
-  //       var pixel = image.getPixelSafe(x, y);
-  //       if (pixel is img.PixelUint8) {
-  //         num red = pixel.r;
-  //         num green = pixel.g;
-  //         num blue = pixel.b;
-  //
-  //         input[0][y][x][0] = red.toDouble() / 255.0;
-  //         input[0][y][x][1] = green.toDouble() / 255.0;
-  //         input[0][y][x][2] = blue.toDouble() / 255.0;
-  //       }
-  //     }
-  //   }
-  //
-  //   // Tùy số lớp output mà bạn điều chỉnh số chiều đầu ra
-  //   List output = List.generate(1, (i) => List.filled(15, 0.0));
-  //   _interpreter.run(input, output);
-  //
-  //   List<double> probabilities = output[0].cast<double>();
-  //   int labelIndex = probabilities.indexOf(
-  //     probabilities.reduce((a, b) => a > b ? a : b),
-  //   );
-  //   result.value = label[labelIndex];
-  // }
-
 
   Future<void> classifyImage(File imageFile) async {
     img.Image? image = img.decodeImage(imageFile.readAsBytesSync());

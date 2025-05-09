@@ -1,72 +1,59 @@
 import os
-from collections import Counter
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.preprocessing import LabelEncoder
 import cv2
+import pandas as pd
+from matplotlib import pyplot as plt
 
-DATA_DIR = r"D:\datn_haui\new_model\dataset\fruits-360\Training"
+dataset = r"D:\\datn_haui\\new_model\\dataset\\Vegetable Images"
 
-class_names = sorted(os.listdir(DATA_DIR))
-num_classes = len(class_names)
+train_dir = os.path.join(dataset, "train")
+test_dir = os.path.join(dataset, "validation")
+val_dir = os.path.join(dataset, "test")
 
-label_encoder = LabelEncoder()
-class_labels = label_encoder.fit_transform(class_names)
+# Initialize list to store dimensions (height, width, channels)
+image_dimensions = []
 
-image_counts = {class_name: len(os.listdir(os.path.join(DATA_DIR, class_name))) for class_name in class_names}
-encoded_counts = {label_encoder.transform([cls])[0]: count for cls, count in image_counts.items()}
-plt.figure(figsize=(16, 6))
-sns.barplot(x= list(encoded_counts.keys()), y= list(encoded_counts.values()), palette="viridis")
+# Get list of classes
+classes = os.listdir(train_dir)
 
-plt.xlabel("Class (Encoded)", fontsize=14)
-plt.ylabel("Number of Images", fontsize=14)
-plt.title(f"Dataset Distribution ({num_classes} Classes)", fontsize=16)
-plt.xticks([])
+plt.figure(figsize=(15, 10))
+
+# Loop through each class and process the images
+for i, class_name in enumerate(classes):
+    class_dir = os.path.join(train_dir, class_name)
+    images = os.listdir(class_dir)
+
+    # Read the first image in the class directory
+    image_path = os.path.join(class_dir, images[0])
+    image = cv2.imread(image_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    # Save height, width, and number of channels
+    height, width, channels = image.shape
+    image_dimensions.append((height, width, channels))
+
+    # Plot the image
+    plt.subplot(3, 5, i+1)
+    plt.imshow(image)
+    plt.title(class_name)
+    plt.axis('off')
+
 plt.show()
 
-def show_sample_images(num_samples=5):
-    fig, axes = plt.subplots(num_samples, num_samples, figsize=(10, 10))
-    axes = axes.ravel()
+df = pd.DataFrame(image_dimensions, columns=["Height", "Width", "Channels"])
+var = df.describe().loc[["min", "mean", "max"]]
+print(var)
 
-    for i, class_name in enumerate(np.random.choice(class_names, num_samples**2, replace=False)):
-        img_folder = os.path.join(DATA_DIR, class_name)
-        img_file = np.random.choice(os.listdir(img_folder))
-        img_path = os.path.join(img_folder, img_file)
+count_dict = {}
 
-        # Đọc ảnh
-        img = cv2.imread(img_path)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+for root, dirs, files in os.walk(train_dir):
+    clase = os.path.basename(root)
+    count_dict[clase] = len(files)
 
-        # Hiển thị
-        axes[i].imshow(img)
-        axes[i].set_title(class_name, fontsize=8)
-        axes[i].axis("off")
-
-    plt.tight_layout()
-    plt.show()
-
-show_sample_images()
-
-
-DATA_DIR = r"D:\datn_haui\new_model\dataset\fruits-360\Training"
-
-image_sizes = []
-
-for class_name in os.listdir(DATA_DIR):
-    class_path = os.path.join(DATA_DIR, class_name)
-
-    if os.path.isdir(class_path):
-        for img_name in os.listdir(class_path):
-            img_path = os.path.join(class_path, img_name)
-            img = cv2.imread(img_path)
-            if img is not None:
-                h, w, c = img.shape
-                image_sizes.append((w, h))
-size_counts = Counter(image_sizes)
-
-for size, count in size_counts.items():
-    print(f"Kích thước {size}: {count} ảnh")
-
-
-
+lables = list(count_dict.keys())[1:]
+count = list(count_dict.values())[1:]
+plt.figure(figsize=(20,4))
+plt.bar(lables, count, color="skyblue")
+plt.title("Class distribution")
+plt.xlabel("Vegetable")
+plt.ylabel("Quantity")
+plt.show()

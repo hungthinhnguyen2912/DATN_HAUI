@@ -40,8 +40,9 @@ class AuthController extends GetxController {
           "email": googleUser.email,
           "createdAt": DateTime.now(),
           "uid": userCredential.user!.uid,
-          "avatarUrl": "",
-          "publicIdAvatar": googleUser.photoUrl,
+          "avatarUrl": googleUser.photoUrl,
+          "publicIdAvatar": "",
+          "phone": "",
         });
       }
       DocumentSnapshot userDoc =
@@ -149,7 +150,8 @@ class AuthController extends GetxController {
       name: "",
       email: "",
       createdAt: Timestamp(0, 0),
-      avatarUrl: "", phone: '',
+      avatarUrl: "",
+      phone: '',
     );
     Get.offAll(() => AuthScreen());
     isGoogleUser.value = false;

@@ -24,7 +24,7 @@ for label in np.unique(labels):
     prototypes[label] = np.mean(class_features, axis=0)
 
 def predict_with_unknown(image):
-    feature = feature_model.predict(np.expand_dims(image, axis=0))[0]  # shape: (64,)
+    feature = feature_model.predict(np.expand_dims(image, axis=0))[0]
     sims = {label: cosine_similarity([feature], [proto])[0][0] for label, proto in prototypes.items()}
     max_label, max_score = max(sims.items(), key=lambda x: x[1])
 

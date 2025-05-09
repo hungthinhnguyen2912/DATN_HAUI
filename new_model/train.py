@@ -58,6 +58,7 @@ test_generator = val_test_datagen.flow_from_directory(
     shuffle=False
 )
 
+
 def load_model(n_layers_to_unfreeze=0):
     inputs = Input(shape=(224, 224, 3))
     base_model = MobileNetV2(weights='imagenet', include_top=False, input_tensor=inputs)
@@ -67,6 +68,7 @@ def load_model(n_layers_to_unfreeze=0):
     if n_layers_to_unfreeze > 0:
         for layer in base_model.layers[-n_layers_to_unfreeze:]:
             layer.trainable = True
+
     x = base_model.output
     x = GlobalAveragePooling2D()(x)
 
@@ -78,6 +80,8 @@ def load_model(n_layers_to_unfreeze=0):
     model = Model(inputs=inputs, outputs=target_output)
 
     return model
+
+
 early_stopping = EarlyStopping(
     monitor='val_loss',
     patience=5,
@@ -89,7 +93,9 @@ reduce_lr = ReduceLROnPlateau(
     patience=2,
     min_lr=1e-6
 )
-def plot_learning_curves(history):
+
+
+def plot(history):
     plt.figure(figsize=(12, 4))
 
     # Loss plot
@@ -134,10 +140,10 @@ def train_model(model,
                         callbacks=callbacks)
     history_df = pd.DataFrame(history.history)
     model.save("model.keras")
-    plot_learning_curves(history_df)
+    plot(history_df)
 
 
-model = load_model(2)
+model = load_model(10)
 
 train_model(model,
             train_generator,
