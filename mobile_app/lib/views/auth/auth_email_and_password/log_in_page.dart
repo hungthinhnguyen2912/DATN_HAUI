@@ -18,12 +18,14 @@ class LogInPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            flex: 1,
+          // Giao diện chính
+          SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               children: [
+                SizedBox(height: 100),
                 InputTextField(
                   controller: _emailController,
                   hintText: "Email",
@@ -53,18 +55,26 @@ class LogInPage extends StatelessWidget {
                   ),
                 ),
                 ButtonAuth(content: "Log In", onTap: () => logIn()),
+                SizedBox(height: 20),
+                Text(
+                  "or log in with",
+                  style: TextStyle(color: AppColors.gray_login_text),
+                ),
+                SizedBox(height: 20),
+                buildGoogleSignIn(),
+                SizedBox(height: 20),
+                buildPhoneSignIn(),
               ],
             ),
           ),
-          Text(
-            "or log in with",
-            style: TextStyle(color: AppColors.gray_login_text),
-          ),
-          SizedBox(height: 60),
-          Expanded(
-            flex: 1,
-            child: Column(children: [buildGoogleSignIn(),SizedBox(height: 20,), buildPhoneSignIn()]),
-          ),
+          Obx(() {
+            return P.auth.isLoadingLogIn.value
+                ? Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+                : SizedBox.shrink();
+          }),
         ],
       ),
     );
@@ -137,10 +147,14 @@ class LogInPage extends StatelessWidget {
   }
 
   void logIn() async {
+    P.auth.isLoadingLogIn.value = true;
     await P.auth.login(_emailController.text, _passwordController.text);
+    P.auth.isLoadingLogIn.value = false;
   }
 
   void googleLogIn() async {
+    P.auth.isLoadingLogIn.value = true;
     await P.auth.loginWithGoogle();
+    P.auth.isLoadingLogIn.value = false;
   }
 }

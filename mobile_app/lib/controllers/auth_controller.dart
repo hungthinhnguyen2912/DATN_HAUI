@@ -12,6 +12,7 @@ import '../views/auth/auth_screen.dart';
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  RxBool isLoadingLogIn = false.obs;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   RxBool isGoogleUser = false.obs;
   Rxn<User> firebaseUser = Rxn<User>();

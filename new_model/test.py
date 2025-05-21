@@ -1,7 +1,4 @@
-from keras import Input
-inputs = Input(shape=(224, 224, 3))
+import os
 
-
-from keras.src.applications.mobilenet_v2 import MobileNetV2
-
-base_model = MobileNetV2(weights='imagenet', include_top=False, input_tensor=inputs)
+os.makedirs("keras", exist_ok=True)
+model.save("keras/model_360.keras")

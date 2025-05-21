@@ -48,7 +48,7 @@ class _myBottomNavBarState extends State<myBottomNavBar> {
             icon: Icon(Icons.access_time_rounded),
             label: "History",
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Setting"),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Profile"),
         ],
         currentIndex: _selectedIndex,
         elevation: 0,

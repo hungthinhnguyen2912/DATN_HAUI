@@ -209,21 +209,22 @@ class ClassificationController extends GetxController {
 
   Future<void> _loadModel() async {
     try {
-      print("🔄 Đang tải mô hình từ assets...");
+      print("Đang tải mô hình từ assets...");
       final options = InterpreterOptions();
       _interpreter = await Interpreter.fromAsset(
-        'assets/tflite/model_4.tflite',
+        'assets/tflite/xInception.tflite',
         options: options,
       );
-      print("✅ Mô hình local đã tải thành công!");
+      print("Mô hình local đã tải thành công!");
     } catch (e) {
-      print("❌ Lỗi tải mô hình local: $e");
+      print("Lỗi tải mô hình local: $e");
     }
-    print("📌 Input tensor shape: ${_interpreter.getInputTensor(0).shape}");
-    print("📌 Output tensor shape: ${_interpreter.getOutputTensor(0).shape}");
+    print("Input tensor shape: ${_interpreter.getInputTensor(0).shape}");
+    print("Output tensor shape: ${_interpreter.getOutputTensor(0).shape}");
   }
 
   Future<void> classifyImage(File imageFile) async {
+    final stopwatch = Stopwatch()..start();
     img.Image? image = img.decodeImage(imageFile.readAsBytesSync());
     if (image == null) {
       result.value = "Error loading image";
@@ -255,6 +256,8 @@ class ClassificationController extends GetxController {
     }
     List output = List.generate(1, (i) => List.filled(15, 0.0));
     _interpreter.run(input, output);
+    stopwatch.stop();
+    print("Classification time: ${stopwatch.elapsedMilliseconds} ms");
     List<double> probabilities = output[0].cast<double>();
     int labelIndex = probabilities.indexOf(
       probabilities.reduce((a, b) => a > b ? a : b),

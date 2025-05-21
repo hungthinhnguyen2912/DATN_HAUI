@@ -21,7 +21,7 @@ class _SettingPageState extends State<SettingPage> {
       appBar: AppBar(
         backgroundColor: AppColors.green,
         title: Text(
-          "Settings",
+          "Profile",
           style: TextStyle(
             color: AppColors.text_color,
             fontSize: 20,
